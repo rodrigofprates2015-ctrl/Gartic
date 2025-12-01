@@ -294,18 +294,22 @@ const HomeScreen = () => {
         <img src={logoTikjogos} alt="TikJogos" className="h-8 md:h-10" />
       </div>
 
-      {/* Tripulante character - left side */}
+      {/* Tripulante character - left side (desktop) / top-left (mobile) */}
       <img 
         src={tripulanteImg} 
         alt="Tripulante" 
-        className="hidden md:block absolute bottom-0 left-4 lg:left-16 h-[50vh] max-h-[500px] object-contain z-10"
+        className="absolute object-contain z-10
+          top-4 left-0 h-[120px] w-auto
+          md:top-auto md:bottom-0 md:left-4 lg:left-16 md:h-[50vh] md:max-h-[500px]"
       />
 
-      {/* Impostor character - right side */}
+      {/* Impostor character - right side (desktop) / bottom-right (mobile) */}
       <img 
         src={impostorImg} 
         alt="Impostor" 
-        className="hidden md:block absolute bottom-0 right-4 lg:right-16 h-[50vh] max-h-[500px] object-contain z-10"
+        className="absolute object-contain z-10
+          bottom-4 right-0 h-[120px] w-auto
+          md:bottom-0 md:right-4 lg:right-16 md:h-[50vh] md:max-h-[500px]"
       />
 
       {/* Main card */}

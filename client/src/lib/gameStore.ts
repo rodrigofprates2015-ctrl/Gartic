@@ -80,6 +80,7 @@ export type GameState = {
   revealQuestion: () => Promise<void>;
   setSpeakingOrder: (order: string[]) => void;
   setShowSpeakingOrderWheel: (show: boolean) => void;
+  triggerSpeakingOrderWheel: () => void;
   addNotification: (notification: { type: 'player-left' | 'host-changed'; message: string }) => void;
   removeNotification: (id: string) => void;
 };

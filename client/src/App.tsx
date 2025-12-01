@@ -3,6 +3,7 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { VersionBadge } from "@/components/VersionBadge";
 import NotFound from "@/pages/not-found";
 import ImpostorGame from "@/pages/ImpostorGame";
 import PrivacyPolicy from "@/pages/PrivacyPolicy";
@@ -30,6 +31,7 @@ function App() {
       <TooltipProvider>
         <Router />
         <Toaster />
+        <VersionBadge />
       </TooltipProvider>
     </QueryClientProvider>
   );

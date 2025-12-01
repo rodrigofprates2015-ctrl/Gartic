@@ -158,6 +158,19 @@ export async function registerRoutes(
     res.type("text/plain").send("google.com, pub-4854252788330308, DIRECT, f08c47fec0942fa0");
   });
 
+  // Serve version info
+  app.get("/api/version", (_req, res) => {
+    try {
+      const fs = require('fs');
+      const path = require('path');
+      const versionPath = path.join(process.cwd(), 'client/public/version.json');
+      const versionData = JSON.parse(fs.readFileSync(versionPath, 'utf-8'));
+      res.json(versionData);
+    } catch (error) {
+      res.json({ version: 'v.1', versionNumber: 1 });
+    }
+  });
+
   await setupAuth(app);
   
   const wss = new WebSocketServer({ noServer: true });

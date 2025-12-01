@@ -3,6 +3,14 @@
 This is a multiplayer social deduction game branded as **TikJogos**. Players join game rooms and try to identify who among them is the impostor through various game modes involving secret words, locations, roles, and questions. The application is built as a full-stack web application with real-time multiplayer capabilities.
 
 ## Recent Changes (December 2025)
+- **Added Beta Version Display System** - Footer badge shows current version that increments with each deploy
+  - Displays "Versão beta v.X" in bottom-right corner (fixed position)
+  - `version.json` file automatically updated during deployment
+  - Run `npm run bump-version` to increment version (v.1 → v.2, etc.)
+  - Helps verify that deploys are reaching production successfully
+  - Files: `version.json`, `client/public/version.json`, `client/src/components/VersionBadge.tsx`, `script/bump-version.ts`
+- **Fixed TypeScript Type Definition** - Added `triggerSpeakingOrderWheel` to GameState type in gameStore.ts
+  - Resolved LSP error preventing builds
 - **Added Synchronized Speaking Order Wheel Lottery** - Host can trigger lottery during gameplay to randomize speaking order
   - Wheel spins for 3 seconds then displays order for 4 seconds
   - Animation synchronized for ALL players via WebSocket broadcast

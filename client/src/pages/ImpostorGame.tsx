@@ -230,15 +230,27 @@ const NeonLines = () => (
 );
 
 const HomeScreen = () => {
-  const { setUser, createRoom, joinRoom, isLoading } = useGameStore();
+  const { setUser, createRoom, joinRoom, isLoading, loadSavedNickname, saveNickname, clearSavedNickname, savedNickname } = useGameStore();
   const [name, setNameInput] = useState("");
   const [code, setCodeInput] = useState("");
+  const [saveNicknameChecked, setSaveNicknameChecked] = useState(false);
   const { toast } = useToast();
+
+  useEffect(() => {
+    const saved = loadSavedNickname();
+    if (saved) {
+      setNameInput(saved);
+      setSaveNicknameChecked(true);
+    }
+  }, [loadSavedNickname]);
 
   const handleCreate = () => {
     if (!name.trim()) {
       toast({ title: "Nome necessário", description: "Por favor, digite seu nome.", variant: "destructive" });
       return;
+    }
+    if (saveNicknameChecked) {
+      saveNickname(name);
     }
     setUser(name);
     createRoom();
@@ -254,11 +266,21 @@ const HomeScreen = () => {
       return;
     }
     
+    if (saveNicknameChecked) {
+      saveNickname(name);
+    }
     setUser(name);
     const success = await joinRoom(code.toUpperCase());
     if (!success) {
       toast({ title: "Erro ao entrar", description: "Sala não encontrada ou código inválido.", variant: "destructive" });
     }
+  };
+
+  const handleClearNickname = () => {
+    clearSavedNickname();
+    setNameInput("");
+    setSaveNicknameChecked(false);
+    toast({ title: "Nickname removido", description: "Próxima vez você precisará digitar novamente." });
   };
 
   return (
@@ -274,7 +296,7 @@ const HomeScreen = () => {
         </div>
       </div>
 
-      <div className="w-full space-y-4">
+      <div className="w-full space-y-3">
         <div className="relative">
           <Input
             type="text"
@@ -286,6 +308,29 @@ const HomeScreen = () => {
             data-testid="input-name"
           />
         </div>
+
+        <div className="flex items-center justify-between px-2">
+          <label className="flex items-center gap-2 cursor-pointer group">
+            <input
+              type="checkbox"
+              checked={saveNicknameChecked}
+              onChange={(e) => setSaveNicknameChecked(e.target.checked)}
+              className="w-4 h-4 rounded bg-gray-800 border border-gray-700 cursor-pointer checked:bg-[#00f2ea] checked:border-[#00f2ea] transition-all"
+              data-testid="checkbox-save-nickname"
+            />
+            <span className="text-xs text-gray-500 group-hover:text-gray-400 transition-colors">Guardar nickname?</span>
+          </label>
+          {savedNickname && (
+            <button
+              onClick={handleClearNickname}
+              className="text-xs text-gray-600 hover:text-gray-400 transition-colors underline"
+              data-testid="button-clear-nickname"
+            >
+              Limpar
+            </button>
+          )}
+        </div>
+      </div>
 
         <Button 
           onClick={handleCreate} 
@@ -344,7 +389,6 @@ const HomeScreen = () => {
             </Link>
           </div>
         </div>
-      </div>
     </div>
   );
 };

@@ -58,8 +58,12 @@ export type GameState = {
   submodeSelect: boolean;
   notifications: Array<{ id: string; type: 'player-left' | 'host-changed'; message: string }>;
   enteredDuringGame: boolean;
+  savedNickname: string | null;
   
   setUser: (name: string) => void;
+  saveNickname: (name: string) => void;
+  clearSavedNickname: () => void;
+  loadSavedNickname: () => string | null;
   createRoom: () => Promise<void>;
   joinRoom: (code: string) => Promise<boolean>;
   selectMode: (mode: GameModeType) => void;
@@ -91,10 +95,32 @@ export const useGameStore = create<GameState>((set, get) => ({
   submodeSelect: false,
   notifications: [],
   enteredDuringGame: false,
+  savedNickname: null,
 
   setUser: (name: string) => {
     const uid = generateUID();
     set({ user: { uid, name } });
+  },
+
+  saveNickname: (name: string) => {
+    if (name.trim()) {
+      localStorage.setItem('tikjogos_saved_nickname', name);
+      set({ savedNickname: name });
+    }
+  },
+
+  clearSavedNickname: () => {
+    localStorage.removeItem('tikjogos_saved_nickname');
+    set({ savedNickname: null });
+  },
+
+  loadSavedNickname: () => {
+    const saved = localStorage.getItem('tikjogos_saved_nickname');
+    if (saved) {
+      set({ savedNickname: saved });
+      return saved;
+    }
+    return null;
   },
 
   fetchGameModes: async () => {

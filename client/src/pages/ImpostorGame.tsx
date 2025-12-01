@@ -26,7 +26,8 @@ import {
   Send,
   RotateCcw,
   Smartphone,
-  MessageSquare
+  MessageSquare,
+  Home
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -127,6 +128,50 @@ const HomeButton = ({ inline = false }: { inline?: boolean } = {}) => {
       <ArrowLeft className="w-4 h-4" />
       <span className="text-sm font-medium">Home</span>
     </button>
+  );
+};
+
+const GameNavButtons = ({ 
+  onBackToLobby, 
+  isImpostor = false 
+}: { 
+  onBackToLobby: () => void; 
+  isImpostor?: boolean;
+}) => {
+  const { leaveGame } = useGameStore();
+  
+  const handleGoHome = () => {
+    leaveGame();
+  };
+
+  return (
+    <div className="w-full flex gap-2">
+      <Button 
+        onClick={handleGoHome}
+        size="icon"
+        className={cn(
+          "rounded-lg",
+          isImpostor 
+            ? "bg-[#4a1a1a] hover:bg-[#5a2a2a] border-2 border-red-400/50 text-red-300"
+            : "bg-[#1a4a5c] hover:bg-[#1a5a6c] border-2 border-cyan-400/50 text-cyan-300"
+        )}
+        data-testid="button-home"
+      >
+        <Home className="w-4 h-4" />
+      </Button>
+      <Button 
+        onClick={onBackToLobby}
+        className={cn(
+          "flex-1 rounded-lg",
+          isImpostor 
+            ? "bg-[#4a1a1a] hover:bg-[#5a2a2a] border-2 border-red-400/50 text-red-300"
+            : "bg-[#1a4a5c] hover:bg-[#1a5a6c] border-2 border-cyan-400/50 text-cyan-300"
+        )}
+        data-testid="button-back-lobby"
+      >
+        <ArrowLeft className="mr-2 w-4 h-4" /> Voltar ao Lobby
+      </Button>
+    </div>
   );
 };
 
@@ -802,7 +847,7 @@ const PerguntasDiferentesScreen = () => {
           {/* Overlay escuro para contraste */}
           <div className="absolute inset-0 bg-[#0a1628]/90 -z-10 rounded-2xl"></div>
           
-          <HomeButton inline />
+          <GameNavButtons onBackToLobby={handleNewRound} isImpostor={isImpostor} />
           <div 
             className={cn(
               "w-full aspect-[3/4] max-h-[500px] rounded-2xl p-8 flex flex-col items-center justify-center text-center relative transition-all duration-500 cursor-pointer overflow-hidden",
@@ -881,7 +926,7 @@ const PerguntasDiferentesScreen = () => {
           {/* Overlay escuro para contraste */}
           <div className="absolute inset-0 bg-[#0a1628]/90 -z-10 rounded-2xl"></div>
           
-          <HomeButton inline />
+          <GameNavButtons onBackToLobby={handleNewRound} isImpostor={isImpostor} />
           <div className="w-full bg-[#16213e]/80 rounded-2xl p-6 border border-[#3d4a5c] space-y-6">
             <div className="text-center space-y-2">
               <p className="text-[#4a90a4] text-sm uppercase tracking-widest font-bold">Sua Pergunta</p>
@@ -978,7 +1023,7 @@ const PerguntasDiferentesScreen = () => {
           {/* Overlay escuro para contraste */}
           <div className="absolute inset-0 bg-[#0a1628]/90 -z-10 rounded-2xl"></div>
           
-          <HomeButton inline />
+          <GameNavButtons onBackToLobby={handleNewRound} isImpostor={isImpostor} />
           <div className="w-full bg-[#16213e]/80 rounded-2xl p-6 border border-[#3d4a5c] space-y-4">
             <div className="text-center space-y-2">
               <p className="text-gray-300 text-xs uppercase tracking-widest">Sua Resposta</p>
@@ -1201,16 +1246,14 @@ const GameScreen = () => {
     }
   };
 
+  const handleBackToLobby = () => {
+    setShowAdPopup(true);
+  };
+
   return (
     <div className="flex flex-col items-center w-full max-w-md min-h-full p-4 animate-fade-in space-y-3 relative z-10">
-      {/* Home Button */}
-      <Button 
-        onClick={handleNewRound}
-        className="w-full bg-[#1a4a5c] hover:bg-[#1a5a6c] border-2 border-cyan-400/50 text-cyan-300 rounded-lg py-2"
-        data-testid="button-home"
-      >
-        <ArrowLeft className="mr-2 w-4 h-4" /> Home
-      </Button>
+      {/* Top Buttons - Home and Back to Lobby for all players */}
+      <GameNavButtons onBackToLobby={handleBackToLobby} isImpostor={isImpostor} />
 
       {/* Main Card */}
       <div 

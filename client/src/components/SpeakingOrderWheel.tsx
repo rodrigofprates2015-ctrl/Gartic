@@ -22,7 +22,7 @@ export function SpeakingOrderWheel({ players, onComplete, isSpinning = true }: S
       setRotation(currentRotation);
     }, 30);
 
-    // Spin for 5 seconds then stop and show result for 2 more seconds
+    // Spin for 3 seconds then stop and show result for 4 more seconds
     const timeout = setTimeout(() => {
       clearInterval(interval);
       
@@ -36,11 +36,11 @@ export function SpeakingOrderWheel({ players, onComplete, isSpinning = true }: S
       // Final rotation to a specific position
       setRotation(360 * 3 + Math.random() * 360);
       
-      // Show result for 2 seconds then close
+      // Show result for 4 seconds then close
       setTimeout(() => {
         onComplete(order);
-      }, 2000);
-    }, 5000);
+      }, 4000);
+    }, 3000);
 
     return () => {
       clearInterval(interval);

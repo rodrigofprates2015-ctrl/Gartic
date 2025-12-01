@@ -24,6 +24,7 @@ export interface IStorage {
   getRoom(code: string): Promise<Room | undefined>;
   updateRoom(code: string, updates: Partial<InsertRoom>): Promise<Room | undefined>;
   addPlayerToRoom(code: string, player: Player): Promise<Room | undefined>;
+  removePlayerFromRoom(code: string, playerId: string): Promise<Room | undefined>;
   deleteRoom(code: string): Promise<void>;
 }
 
@@ -83,6 +84,18 @@ export class MemoryStorage implements IStorage {
     const updatedRoom: Room = {
       ...room,
       players: [...room.players, player]
+    };
+    this.rooms.set(code, updatedRoom);
+    return updatedRoom;
+  }
+
+  async removePlayerFromRoom(code: string, playerId: string): Promise<Room | undefined> {
+    const room = this.rooms.get(code);
+    if (!room) return undefined;
+
+    const updatedRoom: Room = {
+      ...room,
+      players: room.players.filter(p => p.uid !== playerId)
     };
     this.rooms.set(code, updatedRoom);
     return updatedRoom;

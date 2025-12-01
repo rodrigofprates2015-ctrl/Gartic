@@ -241,20 +241,31 @@ export async function registerRoutes(
         playerConnections.delete(ws as any);
 
         const room = await storage.getRoom(currentRoomCode);
-        if (!room) return;
+        if (!room || !currentPlayerId) return;
+
+        // Remove player from room
+        const disconnectedPlayer = room.players.find(p => p.uid === currentPlayerId);
+        const updatedRoomAfterRemoval = await storage.removePlayerFromRoom(currentRoomCode, currentPlayerId);
 
         // Notify remaining players that someone left
-        const disconnectedPlayer = room.players.find(p => p.uid === currentPlayerId);
         if (disconnectedPlayer && connections && connections.size > 0) {
           broadcastToRoom(currentRoomCode, {
             type: 'player-left',
             playerId: currentPlayerId,
             playerName: disconnectedPlayer.name
           });
+          
+          // Broadcast updated room list
+          if (updatedRoomAfterRemoval) {
+            broadcastToRoom(currentRoomCode, {
+              type: 'room-update',
+              room: updatedRoomAfterRemoval
+            });
+          }
         }
 
         // Check if disconnected player was the host
-        if (room.hostId === currentPlayerId && connections && connections.size > 0) {
+        if (room.hostId === currentPlayerId && connections && connections.size > 0 && updatedRoomAfterRemoval) {
           // Host disconnected and there are still players in the room
           // Find the first remaining player to be the new host
           let newHostId: string | null = null;
@@ -268,26 +279,29 @@ export async function registerRoutes(
           }
 
           // If we couldn't find by tracking connections, use the first player in room that isn't the old host
-          if (!newHostId) {
-            const nextPlayer = room.players.find(p => p.uid !== currentPlayerId);
-            if (nextPlayer) {
-              newHostId = nextPlayer.uid;
-            }
+          if (!newHostId && updatedRoomAfterRemoval.players.length > 0) {
+            newHostId = updatedRoomAfterRemoval.players[0].uid;
           }
 
           if (newHostId) {
             // Transfer host to the new player
-            const updatedRoom = await storage.updateRoom(currentRoomCode, {
+            const finalRoom = await storage.updateRoom(currentRoomCode, {
               hostId: newHostId
             });
 
-            if (updatedRoom) {
-              const newHost = updatedRoom.players.find(p => p.uid === newHostId);
+            if (finalRoom) {
+              const newHost = finalRoom.players.find(p => p.uid === newHostId);
               // Broadcast the room update to all remaining players
               broadcastToRoom(currentRoomCode, { 
                 type: 'host-changed',
                 newHostId,
                 newHostName: newHost?.name
+              });
+              
+              // Broadcast final room state
+              broadcastToRoom(currentRoomCode, {
+                type: 'room-update',
+                room: finalRoom
               });
             }
           }

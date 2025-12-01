@@ -8,6 +8,7 @@ import NotFound from "@/pages/not-found";
 import ImpostorGame from "@/pages/ImpostorGame";
 import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import TermsOfUse from "@/pages/TermsOfUse";
+import ComoJogar from "@/pages/ComoJogar";
 import { useAuth } from "@/hooks/useAuth";
 
 function Router() {
@@ -16,6 +17,8 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={ImpostorGame} />
+      <Route path="/comojogar" component={ComoJogar} />
+      <Route path="/como-jogar" component={ComoJogar} />
       <Route path="/privacidade" component={PrivacyPolicy} />
       <Route path="/privacy" component={PrivacyPolicy} />
       <Route path="/termos" component={TermsOfUse} />

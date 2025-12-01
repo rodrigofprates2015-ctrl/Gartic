@@ -5,7 +5,7 @@ export type Player = {
   name: string;
 };
 
-export type GameStatus = 'home' | 'lobby' | 'modeSelect' | 'submodeSelect' | 'playing';
+export type GameStatus = 'home' | 'lobby' | 'modeSelect' | 'submodeSelect' | 'spinning' | 'playing';
 
 export type GameModeType = 
   | "palavraSecreta"

@@ -526,18 +526,14 @@ const ModeSelectScreen = () => {
   const handleStartGameWithSorteio = async () => {
     if (!selectedMode || !room) return;
     
+    // Se é modo de perguntas diferentes, pula sorteio
+    if (selectedMode === 'perguntasDiferentes') {
+      await startGame();
+      return;
+    }
+    
     setIsStarting(true);
     setShowSpeakingOrderWheel(true);
-    
-    // Esperar a roleta completar (3 segundos) e depois iniciar o jogo
-    setTimeout(async () => {
-      try {
-        await startGame();
-      } catch (error) {
-        console.error('Erro ao iniciar jogo:', error);
-      }
-      setIsStarting(false);
-    }, 4000); // 3s da roleta + 1s de buffer
   };
 
   const handleBackClick = () => {
@@ -616,9 +612,16 @@ const ModeSelectScreen = () => {
       {showSpeakingOrderWheel && room && (
         <SpeakingOrderWheel 
           players={room.players} 
-          onComplete={(order) => {
+          onComplete={async (order) => {
             setSpeakingOrder(order);
             setShowSpeakingOrderWheel(false);
+            // Inicia o jogo após o sorteio
+            try {
+              await startGame();
+            } catch (error) {
+              console.error('Erro ao iniciar jogo:', error);
+            }
+            setIsStarting(false);
           }}
           isSpinning={true}
         />

@@ -138,11 +138,12 @@ export const useGameStore = create<GameState>((set, get) => ({
       ws.close();
     }
 
+    const user = get().user;
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const newWs = new WebSocket(`${protocol}//${window.location.host}/game-ws`);
 
     newWs.onopen = () => {
-      newWs.send(JSON.stringify({ type: 'join-room', roomCode: code }));
+      newWs.send(JSON.stringify({ type: 'join-room', roomCode: code, playerId: user?.uid }));
     };
 
     newWs.onmessage = (event) => {

@@ -162,6 +162,7 @@ export async function registerRoutes(
   
   const wss = new WebSocketServer({ noServer: true });
   const roomConnections = new Map<string, Set<WebSocket>>();
+  const playerConnections = new Map<string, { roomCode: string; playerId?: string }>();
 
   function broadcastToRoom(roomCode: string, data: unknown) {
     const connections = roomConnections.get(roomCode);
@@ -185,19 +186,22 @@ export async function registerRoutes(
 
   wss.on('connection', (ws) => {
     let currentRoomCode: string | null = null;
+    let currentPlayerId: string | null = null;
 
     ws.on('message', async (message) => {
       try {
         const data = JSON.parse(message.toString());
         
-        if (data.type === 'join-room' && data.roomCode) {
+        if (data.type === 'join-room' && data.roomCode && data.playerId) {
           currentRoomCode = data.roomCode as string;
+          currentPlayerId = data.playerId as string;
           const roomCode = currentRoomCode;
           
           if (!roomConnections.has(roomCode)) {
             roomConnections.set(roomCode, new Set());
           }
           roomConnections.get(roomCode)!.add(ws);
+          playerConnections.set(ws as any, { roomCode, playerId: currentPlayerId });
           
           const room = await storage.getRoom(roomCode);
           if (room) {
@@ -225,13 +229,55 @@ export async function registerRoutes(
       }
     });
 
-    ws.on('close', () => {
+    ws.on('close', async () => {
       if (currentRoomCode) {
         const connections = roomConnections.get(currentRoomCode);
         if (connections) {
           connections.delete(ws);
           if (connections.size === 0) {
             roomConnections.delete(currentRoomCode);
+          }
+        }
+        playerConnections.delete(ws as any);
+
+        // Check if disconnected player was the host
+        const room = await storage.getRoom(currentRoomCode);
+        if (room && currentPlayerId && room.hostId === currentPlayerId && connections && connections.size > 0) {
+          // Host disconnected and there are still players in the room
+          // Find the first remaining player to be the new host
+          let newHostId: string | null = null;
+          
+          for (const connection of connections) {
+            const connInfo = playerConnections.get(connection as any);
+            if (connInfo && connInfo.playerId && connInfo.playerId !== currentPlayerId) {
+              newHostId = connInfo.playerId;
+              break;
+            }
+          }
+
+          // If we couldn't find by tracking connections, use the first player in room that isn't the old host
+          if (!newHostId) {
+            const nextPlayer = room.players.find(p => p.uid !== currentPlayerId);
+            if (nextPlayer) {
+              newHostId = nextPlayer.uid;
+            }
+          }
+
+          if (newHostId) {
+            // Transfer host to the new player
+            const updatedRoom = await storage.updateRoom(currentRoomCode, {
+              hostId: newHostId
+            });
+
+            if (updatedRoom) {
+              const newHost = updatedRoom.players.find(p => p.uid === newHostId);
+              // Broadcast the room update to all remaining players
+              broadcastToRoom(currentRoomCode, { 
+                type: 'room-update', 
+                room: updatedRoom,
+                message: newHost ? `${newHost.name} agora é o host da sala!` : 'Host da sala alterado'
+              });
+            }
           }
         }
       }

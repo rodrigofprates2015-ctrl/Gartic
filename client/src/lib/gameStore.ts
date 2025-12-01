@@ -57,6 +57,7 @@ export type GameState = {
   selectedMode: GameModeType | null;
   submodeSelect: boolean;
   notifications: Array<{ id: string; type: 'player-left' | 'host-changed'; message: string }>;
+  enteredDuringGame: boolean;
   
   setUser: (name: string) => void;
   createRoom: () => Promise<void>;
@@ -89,6 +90,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   selectedMode: null,
   submodeSelect: false,
   notifications: [],
+  enteredDuringGame: false,
 
   setUser: (name: string) => {
     const uid = generateUID();
@@ -183,16 +185,24 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   updateRoom: (room: Room) => {
     const currentUser = get().user;
+    const currentRoom = get().room;
     if (!currentUser) return;
 
     let newStatus: GameStatus = 'lobby';
-    if (room.status === 'playing') {
+    let enteredDuringGame = false;
+    
+    // Check if player just entered a room that's already playing
+    if (room.status === 'playing' && (!currentRoom || currentRoom.code !== room.code)) {
+      enteredDuringGame = true;
+      newStatus = 'lobby';
+    } else if (room.status === 'playing') {
       newStatus = 'playing';
     }
 
     set({ 
       room,
       status: newStatus,
+      enteredDuringGame,
     });
   },
 

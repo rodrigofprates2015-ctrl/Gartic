@@ -350,13 +350,14 @@ const HomeScreen = () => {
 };
 
 const LobbyScreen = () => {
-  const { room, user, goToModeSelect, leaveGame } = useGameStore();
+  const { room, user, goToModeSelect, leaveGame, enteredDuringGame } = useGameStore();
   const { toast } = useToast();
 
   if (!room) return null;
 
   const isHost = room.hostId === user?.uid;
   const players = room.players || [];
+  const isWaitingForNextRound = enteredDuringGame && room.status === 'waiting';
 
   const copyLink = () => {
     navigator.clipboard.writeText(window.location.origin + "/#" + room.code);
@@ -428,7 +429,17 @@ const LobbyScreen = () => {
         </ul>
       </div>
 
-      {isHost ? (
+      {isWaitingForNextRound ? (
+        <div className="w-full text-center text-yellow-400 py-4 flex flex-col items-center gap-3">
+          <div className="flex gap-2">
+            <div className="w-2 h-2 bg-yellow-400 rounded-full animate-bounce" style={{ animationDelay: '0ms', boxShadow: '0 0 10px #facc15' }}></div>
+            <div className="w-2 h-2 bg-yellow-400 rounded-full animate-bounce" style={{ animationDelay: '150ms', boxShadow: '0 0 10px #facc15' }}></div>
+            <div className="w-2 h-2 bg-yellow-400 rounded-full animate-bounce" style={{ animationDelay: '300ms', boxShadow: '0 0 10px #facc15' }}></div>
+          </div>
+          <p className="text-sm font-medium">Aguardando próxima rodada...</p>
+          <p className="text-xs text-gray-400">Você entrará quando a rodada começar</p>
+        </div>
+      ) : isHost ? (
         <div className="w-full animate-fade-in">
           <Button 
             onClick={goToModeSelect}

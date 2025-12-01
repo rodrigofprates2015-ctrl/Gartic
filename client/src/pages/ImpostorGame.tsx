@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useGameStore, type GameModeType } from "@/lib/gameStore";
 import { Link } from "wouter";
+import PalavraSuperSecretaSubmodeScreen from "@/pages/PalavraSuperSecretaSubmodeScreen";
 import { 
   User, 
   Zap, 
@@ -1132,6 +1133,7 @@ export default function ImpostorGame() {
       {status === 'home' && <HomeScreen />}
       {status === 'lobby' && <LobbyScreen />}
       {status === 'modeSelect' && <ModeSelectScreen />}
+      {status === 'submodeSelect' && <PalavraSuperSecretaSubmodeScreen />}
       {status === 'playing' && <GameScreen />}
     </div>
   );

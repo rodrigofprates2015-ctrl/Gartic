@@ -5,7 +5,7 @@ export type Player = {
   name: string;
 };
 
-export type GameStatus = 'home' | 'lobby' | 'modeSelect' | 'playing';
+export type GameStatus = 'home' | 'lobby' | 'modeSelect' | 'submodeSelect' | 'playing';
 
 export type GameModeType = 
   | "palavraSecreta"
@@ -55,6 +55,7 @@ export type GameState = {
   ws: WebSocket | null;
   gameModes: GameMode[];
   selectedMode: GameModeType | null;
+  submodeSelect: boolean;
   
   setUser: (name: string) => void;
   createRoom: () => Promise<void>;
@@ -83,6 +84,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   ws: null,
   gameModes: [],
   selectedMode: null,
+  submodeSelect: false,
 
   setUser: (name: string) => {
     const uid = generateUID();
@@ -103,6 +105,13 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   selectMode: (mode: GameModeType) => {
     set({ selectedMode: mode });
+    
+    // If Palavra Secreta, show submode selection first
+    if (mode === 'palavraSecreta') {
+      set({ status: 'submodeSelect' });
+    } else {
+      set({ status: 'playing' });
+    }
   },
 
   goToModeSelect: () => {
@@ -112,7 +121,7 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   backToLobby: () => {
     const { user, room, ws } = get();
-    set({ status: 'lobby', selectedMode: null });
+    set({ status: 'lobby', selectedMode: null, submodeSelect: false });
     
     // If host, broadcast to all players
     if (room && user && room.hostId === user.uid && ws && ws.readyState === WebSocket.OPEN) {

@@ -1,0 +1,78 @@
+import { useGameStore } from "@/lib/gameStore";
+import { PALAVRA_SECRETA_SUBMODES, type PalavraSuperSecretaSubmode } from "@/lib/palavra-secreta-submodes";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft, Sparkles } from "lucide-react";
+
+const PalavraSuperSecretaSubmodeScreen = () => {
+  const { startGame, backToLobby, user, room } = useGameStore();
+  const isHost = room && user && room.hostId === user.uid;
+
+  const handleSelectSubmode = (submode: PalavraSuperSecretaSubmode) => {
+    const submodeData = PALAVRA_SECRETA_SUBMODES[submode];
+    const randomWord = submodeData.words[Math.floor(Math.random() * submodeData.words.length)];
+    
+    // Store submode and word in game state
+    localStorage.setItem('selectedSubmode', submode);
+    localStorage.setItem('palavraSecretaWord', randomWord);
+    
+    if (isHost) {
+      startGame();
+    }
+  };
+
+  return (
+    <div className="w-full max-w-2xl mx-auto px-4 py-6 space-y-6">
+      <div className="text-center space-y-2">
+        <div className="flex items-center justify-center gap-2 text-[#00f2ea] mb-4">
+          <Sparkles className="w-5 h-5" />
+          <h1 className="text-3xl font-bold">Escolha um Tema</h1>
+          <Sparkles className="w-5 h-5" />
+        </div>
+        <p className="text-gray-400 text-sm">Selecione a categoria de palavras para jogar</p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {(Object.entries(PALAVRA_SECRETA_SUBMODES) as Array<[PalavraSuperSecretaSubmode, typeof PALAVRA_SECRETA_SUBMODES['classico']]>).map(([submodeId, submode]) => (
+          <button
+            key={submodeId}
+            onClick={() => handleSelectSubmode(submodeId)}
+            disabled={!isHost}
+            className="group relative p-4 rounded-lg border border-gray-700 bg-[#0f0f1e] hover:border-[#00f2ea] hover:bg-[#1a1a2e] transition-all duration-300 text-left disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{
+              boxShadow: 'inset 0 0 20px rgba(0, 0, 0, 0.5)',
+            }}
+            data-testid={`button-submode-${submodeId}`}
+          >
+            <div className="space-y-2">
+              <h3 className="text-lg font-bold text-[#00f2ea] group-hover:text-[#ff0050] transition-colors">
+                {submode.title}
+              </h3>
+              <p className="text-sm text-gray-400">{submode.desc}</p>
+              <p className="text-xs text-gray-600">{submode.words.length} palavras</p>
+            </div>
+
+            {!isHost && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/60 rounded-lg">
+                <p className="text-gray-300 text-sm font-medium">Aguardando o host...</p>
+              </div>
+            )}
+          </button>
+        ))}
+      </div>
+
+      <div className="flex gap-3">
+        <Button
+          onClick={backToLobby}
+          variant="outline"
+          className="flex-1 border border-gray-700 text-gray-400 hover:text-[#00f2ea]"
+          data-testid="button-back-to-lobby"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Voltar
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+export default PalavraSuperSecretaSubmodeScreen;

@@ -2,13 +2,14 @@
 
 This is a multiplayer social deduction game branded as **TikJogos**. Players join game rooms and try to identify who among them is the impostor through various game modes involving secret words, locations, roles, and questions. The application is built as a full-stack web application with real-time multiplayer capabilities.
 
-## Recent Changes (November 2025)
-- **Replaced Replit Auth with GitHub OAuth** - Now works on Railway and other platforms
-- Created users and sessions tables in schema for auth storage
-- Added auth hooks and utilities for client-side authentication
-- Rebranded to TikJogos with new logo
-- Added donation button with PIX payment modal
-- PIX Key: `48492456-23f1-4edc-b739-4e36547ef90e`
+## Recent Changes (December 2025)
+- **Added Palavra Secreta Submode Selection** - New screen for choosing themed categories before game starts
+- Five submodes: Clássico, Clash Royale, Animes, Marvel, Stranger Things
+- Each submode has 20-30 themed words for variety
+- Fixed "Nova Rodada" button and host back-to-lobby broadcast
+- All players automatically return to lobby when host clicks back
+- Google AdSense auto ads enabled and working
+- Railway deployment fully functional with custom domain
 
 ## Environment Variables for Deployment (Railway, etc.)
 
@@ -108,6 +109,12 @@ Preferred communication style: Simple, everyday language.
 
 **Five Distinct Game Types**
 1. **Palavra Secreta**: Everyone gets same word except impostor
+   - **Submodes** (new feature):
+     - Clássico: 20 random words
+     - Clash Royale: 20 game cards/characters
+     - Animes: 20 anime characters/titles/powers
+     - Marvel: 20 characters/items/movies
+     - Stranger Things: 30 characters/items/locations
 2. **Locais & Funções**: Players receive location and role assignments
 3. **Duas Facções**: Two teams with different words, impostor knows neither
 4. **Categoria + Item**: Category revealed to all, specific item hidden from impostor
@@ -118,6 +125,7 @@ Preferred communication style: Simple, everyday language.
 - Server randomly selects and assigns based on mode rules
 - Game data stored flexibly in JSONB to accommodate varying structures
 - Client receives role-specific information based on player assignment
+- Palavra Secreta submodes stored in `client/src/lib/palavra-secreta-submodes.ts`
 
 ## Build and Deployment
 

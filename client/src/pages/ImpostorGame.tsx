@@ -1205,7 +1205,7 @@ const GameScreen = () => {
                   src={isImpostor ? impostorImg : tripulanteImg} 
                   alt={isImpostor ? "Impostor" : "Tripulante"}
                   className="w-full h-auto"
-                  style={{ transform: 'scale(1.8) translateY(25%)' }}
+                  style={{ transform: 'scale(1.5) translateY(18%)' }}
                 />
               </div>
               {/* Hide Button */}

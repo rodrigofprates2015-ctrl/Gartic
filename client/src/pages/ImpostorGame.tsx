@@ -229,6 +229,7 @@ const HomeScreen = () => {
   const [name, setNameInput] = useState("");
   const [code, setCodeInput] = useState("");
   const [saveNicknameChecked, setSaveNicknameChecked] = useState(false);
+  const [isDonationOpen, setIsDonationOpen] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -405,6 +406,10 @@ const HomeScreen = () => {
           </Link>
         </div>
       </div>
+
+      {/* Donation Button and Modal */}
+      <DonationButton onClick={() => setIsDonationOpen(true)} />
+      <DonationModal isOpen={isDonationOpen} onClose={() => setIsDonationOpen(false)} />
     </div>
   );
 };

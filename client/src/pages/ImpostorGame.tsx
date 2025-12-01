@@ -526,14 +526,18 @@ const ModeSelectScreen = () => {
   const handleStartGameWithSorteio = async () => {
     if (!selectedMode || !room) return;
     
+    setIsStarting(true);
+    
     // Se é modo de perguntas diferentes, pula sorteio
     if (selectedMode === 'perguntasDiferentes') {
       await startGame();
+      setIsStarting(false);
       return;
     }
     
-    setIsStarting(true);
-    setShowSpeakingOrderWheel(true);
+    // Para outros modos, inicia direto (sorteio aparecerá depois)
+    await startGame();
+    setIsStarting(false);
   };
 
   const handleBackClick = () => {
@@ -608,24 +612,6 @@ const ModeSelectScreen = () => {
       >
         <Rocket className="mr-2" /> INICIAR PARTIDA
       </Button>
-      
-      {showSpeakingOrderWheel && room && (
-        <SpeakingOrderWheel 
-          players={room.players} 
-          onComplete={async (order) => {
-            setSpeakingOrder(order);
-            setShowSpeakingOrderWheel(false);
-            // Inicia o jogo após o sorteio
-            try {
-              await startGame();
-            } catch (error) {
-              console.error('Erro ao iniciar jogo:', error);
-            }
-            setIsStarting(false);
-          }}
-          isSpinning={true}
-        />
-      )}
     </div>
   );
 };
@@ -986,7 +972,7 @@ const PerguntasDiferentesScreen = () => {
 };
 
 const GameScreen = () => {
-  const { user, room, returnToLobby } = useGameStore();
+  const { user, room, returnToLobby, speakingOrder, setSpeakingOrder, showSpeakingOrderWheel, setShowSpeakingOrderWheel } = useGameStore();
   const [isRevealed, setIsRevealed] = useState(false);
   const [showAdPopup, setShowAdPopup] = useState(false);
 
@@ -997,6 +983,10 @@ const GameScreen = () => {
   const handleCloseAd = () => {
     setShowAdPopup(false);
     returnToLobby();
+  };
+
+  const handleStartSorteio = () => {
+    setShowSpeakingOrderWheel(true);
   };
 
   if (!room) return null;
@@ -1193,13 +1183,33 @@ const GameScreen = () => {
       </p>
 
       {isHost && (
-        <Button 
-          onClick={handleNewRound}
-          className="mt-4 border-2 border-gray-700 bg-transparent text-gray-400 hover:border-[#00f2ea] hover:text-[#00f2ea] hover:bg-transparent w-full rounded-lg"
-          data-testid="button-return-lobby"
-        >
-          <ArrowLeft className="mr-2 w-4 h-4" /> Nova Rodada
-        </Button>
+        <div className="w-full space-y-2">
+          <Button 
+            onClick={handleStartSorteio}
+            className="w-full bg-gradient-to-r from-[#00f2ea]/20 to-[#ff0050]/20 border-2 border-[#00f2ea] text-[#00f2ea] hover:from-[#00f2ea]/30 hover:to-[#ff0050]/30 rounded-lg"
+            data-testid="button-sorteio"
+          >
+            <Zap className="mr-2 w-4 h-4" /> Sortear Ordem de Fala
+          </Button>
+          <Button 
+            onClick={handleNewRound}
+            className="w-full border-2 border-gray-700 bg-transparent text-gray-400 hover:border-[#00f2ea] hover:text-[#00f2ea] hover:bg-transparent rounded-lg"
+            data-testid="button-return-lobby"
+          >
+            <ArrowLeft className="mr-2 w-4 h-4" /> Nova Rodada
+          </Button>
+        </div>
+      )}
+
+      {showSpeakingOrderWheel && room && (
+        <SpeakingOrderWheel 
+          players={room.players} 
+          onComplete={(order) => {
+            setSpeakingOrder(order);
+            setShowSpeakingOrderWheel(false);
+          }}
+          isSpinning={true}
+        />
       )}
 
       <AdPopup isOpen={showAdPopup} onClose={handleCloseAd} />

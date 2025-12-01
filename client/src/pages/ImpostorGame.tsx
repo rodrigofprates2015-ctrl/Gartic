@@ -133,7 +133,7 @@ const HomeButton = ({ inline = false }: { inline?: boolean } = {}) => {
 const DonationButton = ({ onClick }: { onClick: () => void }) => (
   <button
     onClick={onClick}
-    className="fixed top-4 right-4 z-40 flex items-center gap-2 px-4 py-2 bg-[#c44536]/20 border-2 border-[#c44536] rounded-xl text-[#c44536] hover:bg-[#c44536]/30 transition-all font-semibold"
+    className="fixed top-4 right-4 z-40 flex items-center gap-2 px-4 py-2 bg-[#c44536] border-2 border-[#a33526] rounded-xl text-white hover:bg-[#d45546] transition-all font-semibold shadow-lg"
   >
     <Heart className="w-4 h-4 fill-current" />
     <span className="text-sm font-medium">Doar</span>

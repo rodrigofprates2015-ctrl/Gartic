@@ -4,42 +4,42 @@
 @theme inline {
   --font-poppins: "Poppins", sans-serif;
   
-  /* New Retro/Vintage Color Palette */
-  --color-background: #1a1a2e;
-  --color-foreground: #eaeaea;
-  --color-card: #16213e;
-  --color-card-foreground: #eaeaea;
+  /* Retro/Vintage Color Palette - HSL format (H S% L%) */
+  --color-background: 240 27% 14%;
+  --color-foreground: 0 0% 92%;
+  --color-card: 221 48% 16%;
+  --color-card-foreground: 0 0% 92%;
   
   /* Primary - Warm Orange */
-  --color-primary: #e07b39;
-  --color-primary-foreground: #ffffff;
+  --color-primary: 24 74% 55%;
+  --color-primary-foreground: 0 0% 100%;
   
   /* Secondary - Forest Green */
-  --color-secondary: #3d8b5f;
-  --color-secondary-foreground: #ffffff;
+  --color-secondary: 149 39% 39%;
+  --color-secondary-foreground: 0 0% 100%;
   
   /* Accent - Ocean Blue */
-  --color-accent: #4a90a4;
-  --color-accent-foreground: #ffffff;
+  --color-accent: 193 36% 47%;
+  --color-accent-foreground: 0 0% 100%;
   
   /* Danger/Impostor - Wine Red */
-  --color-danger: #c44536;
-  --color-danger-foreground: #ffffff;
+  --color-danger: 7 55% 49%;
+  --color-danger-foreground: 0 0% 100%;
   
   /* Success/Innocent - Teal */
-  --color-success: #2a9d8f;
-  --color-success-foreground: #ffffff;
+  --color-success: 172 59% 39%;
+  --color-success-foreground: 0 0% 100%;
   
   /* Warning - Golden Yellow */
-  --color-warning: #e9c46a;
-  --color-warning-foreground: #1a1a2e;
+  --color-warning: 43 76% 66%;
+  --color-warning-foreground: 240 27% 14%;
   
   /* Muted colors */
-  --color-muted: #2d3a4a;
-  --color-muted-foreground: #9ca3af;
+  --color-muted: 210 25% 24%;
+  --color-muted-foreground: 218 11% 65%;
   
   /* Border */
-  --color-border: #3d4a5c;
+  --color-border: 215 21% 30%;
   
   /* Animations - Softer, playful */
   --animate-fade-in: fadeIn 0.4s ease-out forwards;

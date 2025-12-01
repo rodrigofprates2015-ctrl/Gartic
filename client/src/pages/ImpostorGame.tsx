@@ -79,7 +79,7 @@ const DonationModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
               <span className="font-bold">PIX</span>
             </p>
 
-            <div className="bg-white rounded-xl p-3 mx-auto w-fit">
+            <div className="bg-[#efefef] rounded-xl p-3 mx-auto w-fit">
               <img 
                 src="/pix-qrcode.png" 
                 alt="QR Code PIX" 

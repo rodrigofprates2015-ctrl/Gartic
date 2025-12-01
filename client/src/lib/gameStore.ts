@@ -148,9 +148,8 @@ export const useGameStore = create<GameState>((set, get) => ({
     // If Palavra Secreta, show submode selection first
     if (mode === 'palavraSecreta') {
       set({ status: 'submodeSelect' });
-    } else {
-      set({ status: 'playing' });
     }
+    // Note: status stays at 'modeSelect' - only changes to 'playing' when game actually starts via WebSocket
   },
 
   goToModeSelect: () => {

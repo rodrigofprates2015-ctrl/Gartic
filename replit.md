@@ -3,6 +3,10 @@
 This is a multiplayer social deduction game branded as **TikJogos**. Players join game rooms and try to identify who among them is the impostor through various game modes involving secret words, locations, roles, and questions. The application is built as a full-stack web application with real-time multiplayer capabilities.
 
 ## Recent Changes (December 2025)
+- **Fixed "Perguntas Diferentes" Mode Bug** - Mode now correctly shows PerguntasDiferentesScreen instead of generic GameScreen
+  - Root cause: selectMode() was setting status to 'playing' immediately before the game started on the server
+  - Fix: Status now stays at 'modeSelect' until server confirms game start via WebSocket
+  - This ensures gameMode is properly propagated before GameScreen renders
 - **Complete Visual Redesign to Retro/Vintage Style** - Replaced neon cyberpunk theme with warm, colorful retro palette
   - New color palette: orange (#e07b39), green (#3d8b5f), blue (#4a90a4), wine red (#c44536), yellow (#e9c46a)
   - Updated all buttons to retro style with 3D shadow effects (btn-retro-primary, btn-retro-secondary, etc.)

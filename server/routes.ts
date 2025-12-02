@@ -500,6 +500,76 @@ export async function registerRoutes(
     }
   });
 
+  app.post("/api/rooms/:code/submit-answer", async (req, res) => {
+    try {
+      const { code } = req.params;
+      const { playerId, playerName, answer } = req.body;
+      
+      const room = await storage.getRoom(code.toUpperCase());
+      if (!room) {
+        return res.status(404).json({ error: "Room not found" });
+      }
+
+      if (!room.gameData) {
+        return res.status(400).json({ error: "No game in progress" });
+      }
+
+      const existingAnswers = room.gameData.answers || [];
+      const alreadyAnswered = existingAnswers.some(a => a.playerId === playerId);
+      
+      if (alreadyAnswered) {
+        return res.status(400).json({ error: "Already submitted answer" });
+      }
+
+      const newAnswers = [...existingAnswers, { playerId, playerName, answer }];
+      
+      const updatedRoom = await storage.updateRoom(code.toUpperCase(), {
+        gameData: {
+          ...room.gameData,
+          answers: newAnswers
+        }
+      });
+
+      if (updatedRoom) {
+        broadcastToRoom(code.toUpperCase(), { type: 'room-update', room: updatedRoom });
+      }
+
+      res.json(updatedRoom);
+    } catch (error) {
+      res.status(400).json({ error: "Failed to submit answer" });
+    }
+  });
+
+  app.post("/api/rooms/:code/reveal-answers", async (req, res) => {
+    try {
+      const { code } = req.params;
+      
+      const room = await storage.getRoom(code.toUpperCase());
+      if (!room) {
+        return res.status(404).json({ error: "Room not found" });
+      }
+
+      if (!room.gameData) {
+        return res.status(400).json({ error: "No game in progress" });
+      }
+
+      const updatedRoom = await storage.updateRoom(code.toUpperCase(), {
+        gameData: {
+          ...room.gameData,
+          answersRevealed: true
+        }
+      });
+
+      if (updatedRoom) {
+        broadcastToRoom(code.toUpperCase(), { type: 'room-update', room: updatedRoom });
+      }
+
+      res.json(updatedRoom);
+    } catch (error) {
+      res.status(400).json({ error: "Failed to reveal answers" });
+    }
+  });
+
   app.post("/api/rooms/:code/leave-game", async (req, res) => {
     try {
       const { code } = req.params;

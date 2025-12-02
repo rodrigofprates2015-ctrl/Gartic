@@ -3,6 +3,12 @@
 This is a multiplayer social deduction game branded as **TikJogos**. Players join game rooms and try to identify who among them is the impostor through various game modes involving secret words, locations, roles, and questions. The application is built as a full-stack web application with real-time multiplayer capabilities.
 
 ## Recent Changes (December 2025)
+- **Differential Lobby Return Behavior** - Different behavior when returning to lobby based on player role:
+  - When host/captain returns to lobby: ALL players return to lobby (game ends for everyone)
+  - When crew member (non-host) returns to lobby: Only they return, others continue playing
+  - Waiting players see "Aguardando partida acabar" in italics with low opacity next to their name
+  - New endpoint `/api/rooms/:code/leave-game` marks player as waiting without resetting room
+  - `updateRoom()` now respects `waitingForGame` flag to keep returning players in lobby view
 - **Added Dual Navigation Buttons for All Players** - All players (tripulantes and impostores) now have two buttons in all game modes:
   - Home button (icon): Returns to the initial home page
   - "Voltar ao Lobby" button: Returns to the lobby (shows ad first)

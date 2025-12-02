@@ -272,44 +272,44 @@ export function VotingSystem({
     const crewWins = votesForImpostor > totalPlayers / 2;
     
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm overflow-y-auto">
-        <div className="w-full max-w-md bg-[#0a1628]/95 rounded-2xl p-6 space-y-6">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm">
+        <div className="w-full max-w-md bg-[#0a1628]/95 rounded-2xl p-4 space-y-4 max-h-[90vh] overflow-y-auto">
           <div className={cn(
-            "w-full rounded-2xl p-6 border-2 space-y-6 text-center",
+            "w-full rounded-xl p-4 border-2 space-y-4 text-center",
             crewWins 
               ? "bg-gradient-to-br from-[#3d8b5f]/20 to-[#3d8b5f]/5 border-[#3d8b5f]"
               : "bg-gradient-to-br from-[#c44536]/20 to-[#c44536]/5 border-[#c44536]"
           )}>
-            <div className="space-y-4">
+            <div className="space-y-3">
               <div className={cn(
-                "w-20 h-20 rounded-full flex items-center justify-center mx-auto",
+                "w-16 h-16 rounded-full flex items-center justify-center mx-auto",
                 crewWins ? "bg-[#3d8b5f]" : "bg-[#c44536]"
               )}>
                 {crewWins ? (
-                  <Trophy className="w-10 h-10 text-white" />
+                  <Trophy className="w-8 h-8 text-white" />
                 ) : (
-                  <Skull className="w-10 h-10 text-white" />
+                  <Skull className="w-8 h-8 text-white" />
                 )}
               </div>
               
               <h2 className={cn(
-                "text-3xl font-bold",
+                "text-2xl font-bold",
                 crewWins ? "text-[#3d8b5f]" : "text-[#c44536]"
               )}>
                 {crewWins ? "TRIPULACAO VENCEU!" : "IMPOSTOR VENCEU!"}
               </h2>
               
-              <p className="text-gray-300 text-lg">
+              <p className="text-gray-300">
                 O impostor era: <span className="text-[#c44536] font-bold">{impostorName}</span>
               </p>
             </div>
             
             <div className="w-full h-[1px] bg-gray-700"></div>
             
-            <div className="space-y-4">
-              <p className="text-[#e9c46a] text-sm uppercase tracking-widest font-bold">Resultados da Votacao</p>
+            <div className="space-y-3">
+              <p className="text-[#e9c46a] text-xs uppercase tracking-widest font-bold">Resultados da Votacao</p>
               
-              <div className="space-y-2">
+              <div className="space-y-2 max-h-[150px] overflow-y-auto">
                 {activePlayers.map(player => {
                   const votesReceived = votes.filter((v: PlayerVote) => v.targetId === player.uid).length;
                   const isTheImpostor = player.uid === impostorId;
@@ -317,24 +317,22 @@ export function VotingSystem({
                     <div 
                       key={player.uid}
                       className={cn(
-                        "w-full p-3 rounded-lg flex items-center justify-between",
+                        "w-full p-2.5 rounded-lg flex items-center justify-between",
                         isTheImpostor 
                           ? "bg-[#c44536]/20 border border-[#c44536]/50"
                           : "bg-[#16213e]/50"
                       )}
                     >
-                      <div className="flex items-center gap-2">
-                        <span className={cn(
-                          "font-bold",
-                          isTheImpostor ? "text-[#c44536]" : "text-gray-300"
-                        )}>
-                          {player.name}
-                          {isTheImpostor && " (Impostor)"}
-                        </span>
-                      </div>
+                      <span className={cn(
+                        "font-bold text-sm",
+                        isTheImpostor ? "text-[#c44536]" : "text-gray-300"
+                      )}>
+                        {player.name}
+                        {isTheImpostor && " (Impostor)"}
+                      </span>
                       <div className="flex items-center gap-1">
                         <span className="text-[#e9c46a] font-bold">{votesReceived}</span>
-                        <span className="text-gray-500 text-sm">votos</span>
+                        <span className="text-gray-500 text-xs">votos</span>
                       </div>
                     </div>
                   );
@@ -346,10 +344,10 @@ export function VotingSystem({
           {isHost && (
             <Button 
               onClick={onNewRound}
-              className="w-full h-14 btn-retro-primary font-bold text-lg rounded-lg transition-all"
+              className="w-full h-12 btn-retro-primary font-bold text-base rounded-lg transition-all"
               data-testid="button-new-round"
             >
-              <RotateCcw className="mr-2 w-5 h-5" /> Nova Rodada
+              <RotateCcw className="mr-2 w-4 h-4" /> Nova Rodada
             </Button>
           )}
         </div>

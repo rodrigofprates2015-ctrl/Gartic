@@ -225,11 +225,20 @@ export async function registerRoutes(
         // Handle host back-to-lobby - broadcast to all players in room
         if (data.type === 'host-back-to-lobby' && data.roomCode) {
           const roomCode = data.roomCode as string;
+          const room = await storage.getRoom(roomCode);
+          if (!room) return;
+          
+          // Clear waitingForGame for ALL players when host resets
+          const updatedPlayers = room.players.map(p => ({ ...p, waitingForGame: false }));
+          
           const updatedRoom = await storage.updateRoom(roomCode, {
             status: 'waiting',
             gameMode: null,
             impostorId: null,
-            gameData: null
+            gameData: null,
+            currentCategory: null,
+            currentWord: null,
+            players: updatedPlayers
           });
           
           if (updatedRoom) {

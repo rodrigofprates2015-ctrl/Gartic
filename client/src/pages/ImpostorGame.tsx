@@ -46,8 +46,7 @@ import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import backgroundImg from "@assets/background_1764616571362.png";
 import logoTikjogos from "@assets/logo tikjogos_1764616571363.png";
-import logoImpostor from "@assets/logo_1764616571363.png";
-import logoImpostorMobile from "@assets/logo2_1764619562643.png";
+import logoImpostor from "@assets/a-vibrant-and-colorful-logo-featuring-th_vtb0dbX0SUuBLF3ypF2hNw_IjRWPRXgQ9Ov6UZ3YV9QyA-removebg-preview_1764638356259.png";
 import tripulanteImg from "@assets/Tripulante_1764616571363.png";
 import impostorImg from "@assets/impostor_1764616571362.png";
 
@@ -446,7 +445,7 @@ const HomeScreen = () => {
       <div className="main-card w-[90%] max-w-md p-6 md:p-8 z-20 animate-fade-in">
         {/* Impostor logo with characters */}
         <div className="flex justify-center mb-6">
-          <img src={logoImpostorMobile} alt="Impostor" className="h-24 md:h-28 object-contain" />
+          <img src={logoImpostor} alt="Impostor" className="h-24 md:h-32 object-contain" />
         </div>
 
         {/* Form */}

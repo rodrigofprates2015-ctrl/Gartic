@@ -259,8 +259,10 @@ export async function registerRoutes(
           
           if (room && room.players) {
             // Generate random speaking order on the server so all clients get the same order
-            const shuffled = [...room.players].sort(() => Math.random() - 0.5);
-            const speakingOrder = shuffled.slice(0, Math.min(3, shuffled.length)).map(p => p.uid);
+            // Include ALL active players in the speaking order, not just 3
+            const activePlayers = room.players.filter(p => !p.waitingForGame);
+            const shuffled = [...activePlayers].sort(() => Math.random() - 0.5);
+            const speakingOrder = shuffled.map(p => p.uid);
             
             // Broadcast to all players with the same order
             broadcastToRoom(roomCode, { 
@@ -463,8 +465,10 @@ export async function registerRoutes(
       }
 
       const players = (room.players || []) as Player[];
-      const shuffled = players.sort(() => Math.random() - 0.5);
-      const speakingOrder = shuffled.slice(0, Math.min(3, players.length)).map(p => p.uid);
+      // Include ALL active players in speaking order
+      const activePlayers = players.filter(p => !p.waitingForGame);
+      const shuffled = [...activePlayers].sort(() => Math.random() - 0.5);
+      const speakingOrder = shuffled.map(p => p.uid);
       
       res.json({ speakingOrder });
     } catch (error) {

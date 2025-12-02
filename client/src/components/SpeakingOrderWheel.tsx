@@ -28,9 +28,10 @@ export function SpeakingOrderWheel({ players, onComplete, isSpinning = true, ser
       clearInterval(interval);
       
       // Use server-provided order (same for all clients) or fallback to local generation
+      // Uses ALL players, not just 3
       const order = serverOrder && serverOrder.length > 0 
         ? serverOrder 
-        : [...players].sort(() => Math.random() - 0.5).slice(0, 3).map(p => p.uid);
+        : [...players].sort(() => Math.random() - 0.5).map(p => p.uid);
       
       setSpeakingOrder(order);
       setIsComplete(true);
@@ -116,7 +117,7 @@ export function SpeakingOrderWheel({ players, onComplete, isSpinning = true, ser
           <h2 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#00f2ea] to-[#ff0050] mb-2">
             Definindo Ordem de Fala
           </h2>
-          <p className="text-gray-400 text-sm">Preparando os 3 primeiros a falar...</p>
+          <p className="text-gray-400 text-sm">Sorteando ordem para {players.length} jogadores...</p>
         </div>
 
         {/* Results */}

@@ -61,6 +61,12 @@ export type GameModeType =
   | "categoriaItem"
   | "perguntasDiferentes";
 
+export type PlayerAnswer = {
+  playerId: string;
+  playerName: string;
+  answer: string;
+};
+
 export type GameData = {
   word?: string;
   location?: string;
@@ -72,4 +78,6 @@ export type GameData = {
   question?: string;
   impostorQuestion?: string;
   questionRevealed?: boolean;
+  answers?: PlayerAnswer[];
+  answersRevealed?: boolean;
 };

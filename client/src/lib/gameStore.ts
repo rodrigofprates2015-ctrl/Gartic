@@ -204,18 +204,21 @@ export const useGameStore = create<GameState>((set, get) => ({
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const newWs = new WebSocket(`${protocol}//${window.location.host}/game-ws`);
     
-    let pingInterval: ReturnType<typeof setInterval> | null = null;
     let reconnectAttempts = 0;
     const maxReconnectAttempts = 10;
-    const reconnectDelay = 2000;
+    let visibilityHandler: (() => void) | null = null;
 
-    const startPing = () => {
-      if (pingInterval) clearInterval(pingInterval);
-      pingInterval = setInterval(() => {
-        if (newWs.readyState === WebSocket.OPEN) {
-          newWs.send(JSON.stringify({ type: 'ping' }));
-        }
-      }, 25000);
+    // Exponential backoff for reconnection: 1.5s, 3s, 5s, 8s, 13s...
+    const getReconnectDelay = (attempt: number): number => {
+      const delays = [1500, 3000, 5000, 8000, 13000, 21000, 30000, 30000, 30000, 30000];
+      return delays[Math.min(attempt, delays.length - 1)];
+    };
+
+    const sendSyncRequest = () => {
+      if (newWs.readyState === WebSocket.OPEN) {
+        newWs.send(JSON.stringify({ type: 'sync_request' }));
+        console.log('[Sync] Sent sync_request to server');
+      }
     };
 
     const attemptReconnect = () => {
@@ -233,25 +236,51 @@ export const useGameStore = create<GameState>((set, get) => ({
       if (!currentRoom) return;
       
       reconnectAttempts++;
-      console.log(`Attempting to reconnect (${reconnectAttempts}/${maxReconnectAttempts})...`);
+      const delay = getReconnectDelay(reconnectAttempts - 1);
+      console.log(`Attempting to reconnect (${reconnectAttempts}/${maxReconnectAttempts}) in ${delay}ms...`);
       
       setTimeout(() => {
         get().connectWebSocket(currentRoom.code);
-      }, reconnectDelay);
+      }, delay);
     };
+
+    // Handle tab visibility changes - send sync when tab becomes visible
+    visibilityHandler = () => {
+      if (document.visibilityState === 'visible' && newWs.readyState === WebSocket.OPEN) {
+        console.log('[Visibility] Tab became visible, sending sync_request');
+        sendSyncRequest();
+      }
+    };
+    document.addEventListener('visibilitychange', visibilityHandler);
+
+    // Also sync when window regains focus
+    const focusHandler = () => {
+      if (newWs.readyState === WebSocket.OPEN) {
+        console.log('[Focus] Window regained focus, sending sync_request');
+        sendSyncRequest();
+      }
+    };
+    window.addEventListener('focus', focusHandler);
 
     newWs.onopen = () => {
       console.log('WebSocket connected');
       reconnectAttempts = 0;
       get().setDisconnected(false);
       newWs.send(JSON.stringify({ type: 'join-room', roomCode: code, playerId: user?.uid }));
-      startPing();
+      // Request current room state on connection
+      sendSyncRequest();
     };
 
     newWs.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
-        if (data.type === 'pong') return;
+        
+        // Respond to server ping with pong immediately
+        if (data.type === 'ping') {
+          newWs.send(JSON.stringify({ type: 'pong' }));
+          return;
+        }
+        
         console.log('WebSocket message received:', data.type);
         if (data.type === 'room-update' && data.room) {
           console.log('WebSocket room-update, room status:', data.room.status);
@@ -283,11 +312,18 @@ export const useGameStore = create<GameState>((set, get) => ({
 
     newWs.onerror = (error) => {
       console.error('WebSocket error:', error);
+      // Close and trigger reconnect on error
+      newWs.close();
     };
 
     newWs.onclose = (event) => {
       console.log('WebSocket closed:', event.code, event.reason);
-      if (pingInterval) clearInterval(pingInterval);
+      
+      // Cleanup event listeners
+      if (visibilityHandler) {
+        document.removeEventListener('visibilitychange', visibilityHandler);
+      }
+      window.removeEventListener('focus', focusHandler);
       
       const currentRoom = get().room;
       if (currentRoom && event.code !== 1000) {

@@ -1,0 +1,106 @@
+O site não tá segurando os usuários dentro da partida corretamente. Em momentos do jogo que não é necessario a interação com o site, os jogadores ficam inativos, mas com a tela do celular/computador aberta. Só que da mesma forma o site não segura corretamente os jogadores os deixando na partida. As vezes um jogador parece que saiu do servidor para os outros usuarios, mas para ele ainda está lá.
+
+As vezes parece que ele saiu para os outros usuarios, o proprio usuario que caiu tambem não ve mais seu nome no lobby, mas continua dentro do servidor, só que impossibilitado de jogar. E o host também não consegue começar a partida caso haja só tres jogadores, jogando, pois se tivessem 4 jogadores, daria para iniciar a partida, mas o usuario com problema fica parecendo um ghost no servidor 
+
+Quero que você implemente correções no meu sistema de multiplayer para evitar jogadores fantasmas e desconexões silenciosas. O problema atual é o seguinte:
+
+Quando os jogadores ficam inativos sem interação, alguns acabam desconectando parcialmente.
+
+Para alguns usuários o jogador parece ter saído do lobby, mas para ele mesmo não.
+
+Isso cria um jogador fantasma (ghost player) no servidor.
+
+O host não consegue iniciar o jogo porque o servidor acha que existem mais jogadores conectados do que realmente existem.
+
+Quero que você implemente todas as correções listadas abaixo no backend e frontend:
+
+🔥 Objetivos principais
+
+Criar heartbeat (ping-pong) entre cliente e servidor.
+
+Detectar jogadores inativos e removê-los de forma confiável.
+
+Implementar reconexão automática quando o WebSocket cair ou ficar suspenso.
+
+Criar um sistema de sincronização (sync_request) quando a aba voltar a ter foco.
+
+Impedir o host de iniciar partida com jogadores fantasmas.
+
+🧩 Implementação no Servidor (WebSocket/Node)
+O que fazer no backend:
+
+Manter um registro lastPong para cada jogador conectado.
+
+A cada 5 segundos enviar ping para todos os jogadores.
+
+Se um jogador não responder em até 10 segundos, removê-lo da sala.
+
+Toda alteração deve disparar broadcastLobby() para atualizar todos os clientes.
+
+Implementar rota para sync_request que envia o estado da sala atualizado.
+
+No início da partida validar apenas jogadores ativos com lastPong recente.
+
+Estrutura esperada:
+setInterval(() => {
+  for (const player of players) {
+    if (Date.now() - player.lastPong > 10000) {
+      removePlayer(player.id);
+      broadcastLobby();
+    } else {
+      player.ws.send(JSON.stringify({ type: "ping" }));
+    }
+  }
+}, 5000);
+
+onMessage(data) {
+  if (data.type === "pong") {
+    player.lastPong = Date.now();
+  }
+
+  if (data.type === "sync_request") {
+    sendCurrentLobbyState(player.id);
+  }
+}
+
+🧩 Implementação no Frontend
+Requisitos do cliente:
+
+Quando receber ping, responder pong.
+
+Detectar perda de conexão e tentar reconectar automaticamente.
+
+Usar backoff para reconexões (1.5s / 3s / 5s).
+
+Ao recuperar foco da aba, enviar sync_request.
+
+Se reconectar, solicitar estado do lobby imediatamente.
+
+Estrutura esperada:
+function connect() {
+  socket = new WebSocket(SERVER_URL);
+
+  socket.onopen = () => socket.send(JSON.stringify({ type: "sync_request" }));
+
+  socket.onmessage = msg => {
+    const data = JSON.parse(msg.data);
+    if (data.type === "ping") socket.send(JSON.stringify({ type: "pong" }));
+  };
+
+  socket.onclose = () => setTimeout(connect, 1500);
+  socket.onerror = () => socket.close(); 
+}
+
+window.addEventListener("focus", () => {
+  socket.send(JSON.stringify({ type: "sync_request" }));
+});
+
+connect();
+
+Critério de aceitação
+
+✔ Jogadores fantasmas nunca devem existir
+✔ Se o cliente desconectar, ele deve reconectar sozinho
+✔ Se o socket ficar suspenso por inatividade, sync deve corrigir lobby
+✔ Host só pode iniciar jogo com players ativos de verdade
+✔ Todos os usuários veem o mesmo estado sempre

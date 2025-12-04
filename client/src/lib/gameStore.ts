@@ -76,7 +76,7 @@ export type GameState = {
   gameModes: GameMode[];
   selectedMode: GameModeType | null;
   submodeSelect: boolean;
-  notifications: Array<{ id: string; type: 'player-left' | 'player-joined' | 'player-reconnected' | 'host-changed' | 'disconnected'; message: string }>;
+  notifications: Array<{ id: string; type: 'player-left' | 'player-joined' | 'player-reconnected' | 'host-changed' | 'disconnected' | 'player-kicked'; message: string }>;
   enteredDuringGame: boolean;
   isDisconnected: boolean;
   savedNickname: string | null;
@@ -103,9 +103,10 @@ export type GameState = {
   setSpeakingOrder: (order: string[]) => void;
   setShowSpeakingOrderWheel: (show: boolean) => void;
   triggerSpeakingOrderWheel: () => void;
-  addNotification: (notification: { type: 'player-left' | 'player-joined' | 'player-reconnected' | 'host-changed' | 'disconnected'; message: string }) => void;
+  addNotification: (notification: { type: 'player-left' | 'player-joined' | 'player-reconnected' | 'host-changed' | 'disconnected' | 'player-kicked'; message: string }) => void;
   removeNotification: (id: string) => void;
   setDisconnected: (disconnected: boolean) => void;
+  kickPlayer: (targetPlayerId: string) => void;
 };
 
 function generateUID(): string {
@@ -296,26 +297,46 @@ export const useGameStore = create<GameState>((set, get) => ({
       }
     };
 
-    // beforeunload - fires when user closes tab/browser or navigates away
-    // Note: This event has limited time to execute, WebSocket message may not complete
-    const beforeUnloadHandler = () => {
-      console.log('[Disconnect] beforeunload triggered');
+    // Track if we've already sent a disconnect to avoid duplicates
+    let disconnectSent = false;
+    
+    // Combined handler that tries both methods for maximum reliability
+    const handleDisconnect = (eventName: string) => {
+      if (disconnectSent) {
+        console.log(`[Disconnect] ${eventName}: Already sent disconnect, skipping`);
+        return;
+      }
+      disconnectSent = true;
+      console.log(`[Disconnect] ${eventName}: Sending disconnect via both methods`);
+      
+      // Try WebSocket first (fast but unreliable during unload)
       sendDisconnectNotice();
+      
+      // Also send via sendBeacon (reliable but slightly slower)
+      sendDisconnectBeacon();
+    };
+
+    // beforeunload - fires when user closes tab/browser or navigates away
+    const beforeUnloadHandler = () => {
+      handleDisconnect('beforeunload');
     };
     window.addEventListener('beforeunload', beforeUnloadHandler);
 
-    // pagehide - more reliable on mobile and some browsers for actual page unload
-    // Only fire if page is NOT being cached (persisted = false means true unload)
+    // pagehide - more reliable on mobile and some browsers
     const pageHideHandler = (event: PageTransitionEvent) => {
       console.log('[Disconnect] pagehide triggered, persisted:', event.persisted);
-      // persisted = true means the page is going into bfcache (back-forward cache)
-      // persisted = false means the page is truly being unloaded/closed
+      // Only send if page is NOT being cached (persisted = false means true unload)
       if (!event.persisted) {
-        // Use sendBeacon for reliable delivery during actual unload
-        sendDisconnectBeacon();
+        handleDisconnect('pagehide');
       }
     };
     window.addEventListener('pagehide', pageHideHandler);
+    
+    // unload - last resort fallback
+    const unloadHandler = () => {
+      handleDisconnect('unload');
+    };
+    window.addEventListener('unload', unloadHandler);
 
     newWs.onopen = () => {
       console.log('WebSocket connected');
@@ -366,6 +387,26 @@ export const useGameStore = create<GameState>((set, get) => ({
             message: `${data.newHostName} agora é o host da sala`
           });
         }
+        if (data.type === 'player-kicked') {
+          get().addNotification({
+            type: 'player-kicked',
+            message: `${data.playerName} foi expulso da sala`
+          });
+        }
+        if (data.type === 'kicked') {
+          // Current player was kicked from the room
+          get().addNotification({
+            type: 'player-kicked',
+            message: data.message || 'Você foi expulso da sala pelo host'
+          });
+          // Leave the room and go back to home
+          set({ 
+            room: null, 
+            ws: null, 
+            status: 'home', 
+            selectedMode: null 
+          });
+        }
         if (data.type === 'start-speaking-order-wheel') {
           if (data.speakingOrder) {
             set({ speakingOrder: data.speakingOrder });
@@ -393,6 +434,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       window.removeEventListener('focus', focusHandler);
       window.removeEventListener('beforeunload', beforeUnloadHandler);
       window.removeEventListener('pagehide', pageHideHandler);
+      window.removeEventListener('unload', unloadHandler);
       
       const currentRoom = get().room;
       if (currentRoom && event.code !== 1000) {
@@ -647,7 +689,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     });
   },
 
-  addNotification: (notification: { type: 'player-left' | 'player-joined' | 'player-reconnected' | 'host-changed' | 'disconnected'; message: string }) => {
+  addNotification: (notification: { type: 'player-left' | 'player-joined' | 'player-reconnected' | 'host-changed' | 'disconnected' | 'player-kicked'; message: string }) => {
     const id = Date.now().toString();
     set((state) => ({
       notifications: [...state.notifications, { id, ...notification }]
@@ -661,6 +703,24 @@ export const useGameStore = create<GameState>((set, get) => ({
   removeNotification: (id: string) => {
     set((state) => ({
       notifications: state.notifications.filter(n => n.id !== id)
+    }));
+  },
+
+  kickPlayer: (targetPlayerId: string) => {
+    const { room, ws, user } = get();
+    if (!room || !user || !ws || ws.readyState !== WebSocket.OPEN) return;
+    
+    // Only host can kick
+    if (room.hostId !== user.uid) return;
+    
+    // Cannot kick yourself
+    if (targetPlayerId === user.uid) return;
+    
+    ws.send(JSON.stringify({
+      type: 'kick-player',
+      roomCode: room.code,
+      targetPlayerId,
+      requesterId: user.uid
     }));
   },
 

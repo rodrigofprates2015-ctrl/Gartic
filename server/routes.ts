@@ -680,6 +680,71 @@ export async function registerRoutes(
             });
           }
         }
+
+        // Handle kick-player - host can remove a player from the room
+        if (data.type === 'kick-player' && data.roomCode && data.targetPlayerId && data.requesterId) {
+          const roomCode = data.roomCode as string;
+          const targetPlayerId = data.targetPlayerId as string;
+          const requesterId = data.requesterId as string;
+          
+          const room = await storage.getRoom(roomCode);
+          if (!room) return;
+          
+          // Only host can kick players
+          if (room.hostId !== requesterId) {
+            console.log(`[Kick] Rejected: ${requesterId} is not the host of room ${roomCode}`);
+            return;
+          }
+          
+          // Cannot kick yourself (the host)
+          if (targetPlayerId === requesterId) {
+            console.log(`[Kick] Rejected: Host cannot kick themselves`);
+            return;
+          }
+          
+          const targetPlayer = room.players.find(p => p.uid === targetPlayerId);
+          if (!targetPlayer) {
+            console.log(`[Kick] Player ${targetPlayerId} not found in room ${roomCode}`);
+            return;
+          }
+          
+          console.log(`[Kick] Host ${requesterId} is kicking player ${targetPlayerId} (${targetPlayer.name}) from room ${roomCode}`);
+          
+          // Remove the player from the room
+          const updatedRoom = await storage.removePlayerFromRoom(roomCode, targetPlayerId);
+          
+          if (updatedRoom) {
+            // Find the kicked player's WebSocket and close it
+            playerConnections.forEach((info, playerWs) => {
+              if (info.playerId === targetPlayerId && info.roomCode === roomCode) {
+                // Send kicked notification before closing
+                try {
+                  playerWs.send(JSON.stringify({ 
+                    type: 'kicked', 
+                    message: 'Você foi expulso da sala pelo host' 
+                  }));
+                  playerWs.close();
+                } catch (e) {
+                  console.error('[Kick] Error sending kicked notification:', e);
+                }
+                playerConnections.delete(playerWs);
+                const connections = roomConnections.get(roomCode);
+                if (connections) {
+                  connections.delete(playerWs);
+                }
+              }
+            });
+            
+            // Broadcast to remaining players
+            broadcastToRoom(roomCode, { 
+              type: 'player-kicked', 
+              playerId: targetPlayerId,
+              playerName: targetPlayer.name 
+            });
+            broadcastToRoom(roomCode, { type: 'room-update', room: updatedRoom });
+            console.log(`[Kick] Successfully removed player ${targetPlayer.name} from room ${roomCode}`);
+          }
+        }
       } catch (error) {
         console.error('WebSocket error:', error);
       }

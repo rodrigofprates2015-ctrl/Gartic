@@ -33,7 +33,8 @@ import {
   Check,
   Vote,
   Skull,
-  Trophy
+  Trophy,
+  UserX
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -505,7 +506,7 @@ const HomeScreen = () => {
 };
 
 const LobbyScreen = () => {
-  const { room, user, goToModeSelect, leaveGame } = useGameStore();
+  const { room, user, goToModeSelect, leaveGame, kickPlayer } = useGameStore();
   const { toast } = useToast();
 
   if (!room) return null;
@@ -589,6 +590,18 @@ const LobbyScreen = () => {
                     )}
                   </div>
                 </div>
+                {isHost && !isMe && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => kickPlayer(p.uid)}
+                    className="w-8 h-8 rounded-lg border border-[#3d4a5c] hover:border-[#c44536] hover:bg-[#c44536]/10 text-gray-400 hover:text-[#c44536] transition-all"
+                    data-testid={`button-kick-${p.uid}`}
+                    title="Expulsar jogador"
+                  >
+                    <UserX className="w-4 h-4" />
+                  </Button>
+                )}
               </li>
             );
           })}

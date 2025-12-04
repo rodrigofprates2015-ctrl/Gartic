@@ -573,7 +573,12 @@ export async function registerRoutes(
           const info = playerConnections.get(ws);
           if (info?.roomCode && info?.playerId) {
             console.log(`[Disconnect Notice] Player ${info.playerId} notified disconnect in room ${info.roomCode}`);
-            await markPlayerDisconnected(ws, info.roomCode, info.playerId);
+            try {
+              await markPlayerDisconnected(ws, info.roomCode, info.playerId);
+              console.log(`[Disconnect Notice] Successfully marked player ${info.playerId} as disconnected`);
+            } catch (e) {
+              console.error(`[Disconnect Notice] Error marking player ${info.playerId} as disconnected:`, e);
+            }
           }
           return;
         }

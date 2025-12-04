@@ -496,6 +496,9 @@ export async function registerRoutes(
   async function markPlayerConnected(roomCode: string, playerId: string) {
     console.log(`[Connection] Marking player ${playerId} as connected in room ${roomCode}`);
     
+    // Cancel any pending hard exit timer for this player
+    cancelHardExitRemoval(roomCode, playerId);
+    
     const room = await storage.getRoom(roomCode);
     if (!room) return null;
 
@@ -517,10 +520,114 @@ export async function registerRoutes(
     return updatedRoom;
   }
 
-  // Server-side heartbeat: ping all clients every 5 seconds
-  // Mark players as disconnected (NOT remove) if they don't respond in 10 seconds
-  const PING_INTERVAL = 5000;
-  const DISCONNECT_TIMEOUT = 10000;
+  // Server-side heartbeat configuration
+  // HEARTBEAT_INTERVAL: How often to ping clients
+  // PONG_TIMEOUT: Time before marking player as disconnected_pending (soft disconnect)
+  // HARD_EXIT_FALLBACK_GRACE: Time after disconnect before removing player and transferring host (hard exit)
+  const HEARTBEAT_INTERVAL = 5000;  // 5 seconds
+  const PONG_TIMEOUT = 15000;       // 15 seconds - marks as disconnected_pending
+  const HARD_EXIT_FALLBACK_GRACE = 15000; // 15 seconds - removes player after hard exit detection
+
+  // Track pending hard exit timers
+  const hardExitTimers = new Map<string, NodeJS.Timeout>();
+
+  // Remove player from room and handle host transfer if needed
+  async function handlePlayerHardExit(roomCode: string, playerId: string, reason: string = 'hard_exit') {
+    const timerKey = `${roomCode}:${playerId}`;
+    const existingTimer = hardExitTimers.get(timerKey);
+    if (existingTimer) {
+      clearTimeout(existingTimer);
+      hardExitTimers.delete(timerKey);
+    }
+
+    console.log(`[Hard Exit] Removing player ${playerId} from room ${roomCode} (reason: ${reason})`);
+    
+    const room = await storage.getRoom(roomCode);
+    if (!room) return;
+
+    const playerToRemove = room.players.find(p => p.uid === playerId);
+    if (!playerToRemove) return;
+
+    const wasHost = room.hostId === playerId;
+    
+    // Remove player from room
+    const updatedPlayers = room.players.filter(p => p.uid !== playerId);
+    
+    // Determine new host if needed
+    let newHostId = room.hostId;
+    if (wasHost && updatedPlayers.length > 0) {
+      // Priority: first connected player (oldest by join order), then first disconnected_pending
+      const connectedPlayers = updatedPlayers.filter(p => p.connected !== false);
+      const pendingPlayers = updatedPlayers.filter(p => p.connected === false);
+      
+      if (connectedPlayers.length > 0) {
+        newHostId = connectedPlayers[0].uid;
+      } else if (pendingPlayers.length > 0) {
+        newHostId = pendingPlayers[0].uid;
+      } else {
+        newHostId = updatedPlayers[0].uid;
+      }
+      console.log(`[Host Transfer] Transferring host from ${playerId} to ${newHostId}`);
+    }
+
+    const updatedRoom = await storage.updateRoom(roomCode, {
+      players: updatedPlayers,
+      hostId: newHostId
+    });
+
+    if (updatedRoom) {
+      // Notify all players of the removal
+      broadcastToRoom(roomCode, {
+        type: 'player-removed',
+        playerId,
+        playerName: playerToRemove.name,
+        reason
+      });
+
+      // If host changed, notify about that too
+      if (wasHost && newHostId !== playerId) {
+        const newHostPlayer = updatedPlayers.find(p => p.uid === newHostId);
+        broadcastToRoom(roomCode, {
+          type: 'host-changed',
+          newHostId,
+          newHostName: newHostPlayer?.name
+        });
+      }
+
+      broadcastToRoom(roomCode, { type: 'room-update', room: updatedRoom });
+    }
+  }
+
+  // Schedule hard exit removal after grace period
+  function scheduleHardExitRemoval(roomCode: string, playerId: string) {
+    const timerKey = `${roomCode}:${playerId}`;
+    
+    // Clear any existing timer
+    const existingTimer = hardExitTimers.get(timerKey);
+    if (existingTimer) {
+      clearTimeout(existingTimer);
+    }
+
+    console.log(`[Hard Exit] Scheduling removal for player ${playerId} in ${HARD_EXIT_FALLBACK_GRACE}ms`);
+    
+    const timer = setTimeout(async () => {
+      hardExitTimers.delete(timerKey);
+      await handlePlayerHardExit(roomCode, playerId, 'fallback_grace_expired');
+    }, HARD_EXIT_FALLBACK_GRACE);
+
+    hardExitTimers.set(timerKey, timer);
+  }
+
+  // Cancel scheduled hard exit (e.g., when player reconnects)
+  function cancelHardExitRemoval(roomCode: string, playerId: string) {
+    const timerKey = `${roomCode}:${playerId}`;
+    const existingTimer = hardExitTimers.get(timerKey);
+    if (existingTimer) {
+      clearTimeout(existingTimer);
+      hardExitTimers.delete(timerKey);
+      console.log(`[Hard Exit] Cancelled scheduled removal for player ${playerId}`);
+    }
+  }
 
   setInterval(() => {
     const now = Date.now();
@@ -530,9 +637,13 @@ export async function registerRoutes(
       
       const timeSinceLastPong = now - info.lastPong;
       
-      if (timeSinceLastPong > DISCONNECT_TIMEOUT) {
-        console.log(`[Heartbeat] Player ${info.playerId} unresponsive (${timeSinceLastPong}ms) - marking as disconnected`);
+      // Only mark as disconnected_pending if pong timeout exceeded
+      if (timeSinceLastPong > PONG_TIMEOUT) {
+        console.log(`[Heartbeat] Player ${info.playerId} unresponsive (${timeSinceLastPong}ms) - marking as disconnected_pending`);
         await markPlayerDisconnected(ws, info.roomCode, info.playerId);
+        // Schedule hard exit removal after grace period
+        // If player reconnects within grace period, the timer will be cancelled
+        scheduleHardExitRemoval(info.roomCode, info.playerId);
       } else if (ws.readyState === WebSocket.OPEN) {
         try {
           ws.send(JSON.stringify({ type: 'ping' }));
@@ -541,7 +652,7 @@ export async function registerRoutes(
         }
       }
     });
-  }, PING_INTERVAL);
+  }, HEARTBEAT_INTERVAL);
 
   httpServer.on('upgrade', (request, socket, head) => {
     if (request.url === '/game-ws') {
@@ -568,16 +679,42 @@ export async function registerRoutes(
           return;
         }
         
+        // Handle intentional leave - player wants to exit the room (hard exit)
+        if (data.type === 'leave') {
+          const info = playerConnections.get(ws);
+          if (info?.roomCode && info?.playerId) {
+            console.log(`[Leave] Player ${info.playerId} is leaving room ${info.roomCode} intentionally`);
+            try {
+              // This is a hard exit - remove player immediately and transfer host if needed
+              await handlePlayerHardExit(info.roomCode, info.playerId, 'leave_intentional');
+              // Clean up connection
+              const connections = roomConnections.get(info.roomCode);
+              if (connections) {
+                connections.delete(ws);
+              }
+              playerConnections.delete(ws);
+              console.log(`[Leave] Successfully removed player ${info.playerId} from room ${info.roomCode}`);
+            } catch (e) {
+              console.error(`[Leave] Error removing player ${info.playerId}:`, e);
+            }
+          }
+          return;
+        }
+
         // Handle disconnect_notice - client is about to close (browser exit detection)
+        // This is treated as a hard exit attempt
         if (data.type === 'disconnect_notice') {
           const info = playerConnections.get(ws);
           if (info?.roomCode && info?.playerId) {
             console.log(`[Disconnect Notice] Player ${info.playerId} notified disconnect in room ${info.roomCode}`);
             try {
+              // Mark as disconnected first, then schedule hard exit removal
               await markPlayerDisconnected(ws, info.roomCode, info.playerId);
-              console.log(`[Disconnect Notice] Successfully marked player ${info.playerId} as disconnected`);
+              // Schedule removal after grace period (in case of network issues, not intentional)
+              scheduleHardExitRemoval(info.roomCode, info.playerId);
+              console.log(`[Disconnect Notice] Scheduled hard exit for player ${info.playerId} after grace period`);
             } catch (e) {
-              console.error(`[Disconnect Notice] Error marking player ${info.playerId} as disconnected:`, e);
+              console.error(`[Disconnect Notice] Error processing disconnect for player ${info.playerId}:`, e);
             }
           }
           return;
@@ -765,10 +902,12 @@ export async function registerRoutes(
       console.log(`[Close] WebSocket closed for player ${currentPlayerId} in room ${currentRoomCode}`);
       
       if (currentRoomCode && currentPlayerId) {
-        // Mark player as disconnected (but keep them in the room - they can reconnect)
+        // Mark player as disconnected_pending first
         await markPlayerDisconnected(ws, currentRoomCode, currentPlayerId);
-        // Note: We do NOT remove the player or change host - they might reconnect
-        // Players remain in the room until they manually leave
+        // Schedule hard exit removal after grace period
+        // This handles cases where connection was lost unexpectedly (not intentional leave)
+        // If player reconnects within grace period, the timer is cancelled
+        scheduleHardExitRemoval(currentRoomCode, currentPlayerId);
       }
     });
   });
@@ -828,6 +967,9 @@ export async function registerRoutes(
             console.log(`[Disconnect Beacon] Successfully marked player ${playerId} as disconnected directly`);
           }
         }
+        // Schedule hard exit removal after grace period
+        scheduleHardExitRemoval(roomCode, playerId);
+        console.log(`[Disconnect Beacon] Scheduled hard exit for player ${playerId} after grace period`);
       }
 
       res.status(204).send();

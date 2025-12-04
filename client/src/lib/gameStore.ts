@@ -76,7 +76,7 @@ export type GameState = {
   gameModes: GameMode[];
   selectedMode: GameModeType | null;
   submodeSelect: boolean;
-  notifications: Array<{ id: string; type: 'player-left' | 'player-joined' | 'player-reconnected' | 'host-changed' | 'disconnected' | 'player-kicked'; message: string }>;
+  notifications: Array<{ id: string; type: 'player-left' | 'player-joined' | 'player-reconnected' | 'host-changed' | 'disconnected' | 'player-kicked' | 'player-removed'; message: string }>;
   enteredDuringGame: boolean;
   isDisconnected: boolean;
   savedNickname: string | null;
@@ -103,7 +103,7 @@ export type GameState = {
   setSpeakingOrder: (order: string[]) => void;
   setShowSpeakingOrderWheel: (show: boolean) => void;
   triggerSpeakingOrderWheel: () => void;
-  addNotification: (notification: { type: 'player-left' | 'player-joined' | 'player-reconnected' | 'host-changed' | 'disconnected' | 'player-kicked'; message: string }) => void;
+  addNotification: (notification: { type: 'player-left' | 'player-joined' | 'player-reconnected' | 'host-changed' | 'disconnected' | 'player-kicked' | 'player-removed'; message: string }) => void;
   removeNotification: (id: string) => void;
   setDisconnected: (disconnected: boolean) => void;
   kickPlayer: (targetPlayerId: string) => void;
@@ -393,6 +393,12 @@ export const useGameStore = create<GameState>((set, get) => ({
             message: `${data.playerName} foi expulso da sala`
           });
         }
+        if (data.type === 'player-removed') {
+          get().addNotification({
+            type: 'player-removed',
+            message: `${data.playerName} foi removido da sala (desconectado por muito tempo)`
+          });
+        }
         if (data.type === 'kicked') {
           // Current player was kicked from the room
           get().addNotification({
@@ -678,6 +684,15 @@ export const useGameStore = create<GameState>((set, get) => ({
   leaveGame: () => {
     const ws = get().ws;
     if (ws) {
+      // Send intentional leave message before closing (hard exit)
+      if (ws.readyState === WebSocket.OPEN) {
+        try {
+          ws.send(JSON.stringify({ type: 'leave' }));
+          console.log('[Leave] Sent intentional leave message');
+        } catch (e) {
+          console.error('[Leave] Failed to send leave message:', e);
+        }
+      }
       ws.close();
     }
     
@@ -689,7 +704,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     });
   },
 
-  addNotification: (notification: { type: 'player-left' | 'player-joined' | 'player-reconnected' | 'host-changed' | 'disconnected' | 'player-kicked'; message: string }) => {
+  addNotification: (notification: { type: 'player-left' | 'player-joined' | 'player-reconnected' | 'host-changed' | 'disconnected' | 'player-kicked' | 'player-removed'; message: string }) => {
     const id = Date.now().toString();
     set((state) => ({
       notifications: [...state.notifications, { id, ...notification }]

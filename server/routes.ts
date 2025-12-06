@@ -53,7 +53,7 @@ const GAME_MODES = {
       { crew: "Qual anime tem a melhor trilha sonora?", imp: "Qual anime tem a pior trilha sonora?" },
       { crew: "Qual é seu jogo favorito de todos os tempos?", imp: "Qual jogo você acha o mais injusto?" },
       { crew: "Qual personagem de jogo você mais gosta?", imp: "Qual personagem de jogo você acha irritante?" },
-      { crew: "Qual franquia de games mais te marcou?", imp: "Qual franquia você acha que já deveria ter acabado?" },
+      { crew: "Qual franquia de games mais te marcou?", imp: "Qual franquia de jogos você acha que já deveria ter acabado?" },
       { crew: "Qual foi o último jogo que você zerou?", imp: "Qual jogo você abandonou antes de terminar?" },
       { crew: "Qual seu filme favorito?", imp: "Qual filme você acha superestimado?" },
       { crew: "Qual série você maratonou recentemente?", imp: "Qual série você desistiu de assistir?" },

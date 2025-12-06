@@ -59,6 +59,9 @@ import impostorImg from "@assets/impostor_natal_1764991977974.webp";
 
 const PIX_KEY = "48492456-23f1-4edc-b739-4e36547ef90e";
 
+const MIN_PALAVRAS = 10;
+const MAX_PALAVRAS = 20;
+
 type ThemeWorkshopTab = 'galeria' | 'criar';
 
 type PaymentState = {
@@ -79,7 +82,7 @@ const ThemeWorkshopModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () 
   // Form state for creating new theme
   const [titulo, setTitulo] = useState('');
   const [autor, setAutor] = useState('');
-  const [palavras, setPalavras] = useState<string[]>(Array(20).fill(''));
+  const [palavras, setPalavras] = useState<string[]>(Array(MAX_PALAVRAS).fill(''));
   const [isPublic, setIsPublic] = useState(true);
   
   // Payment state
@@ -159,8 +162,12 @@ const ThemeWorkshopModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () 
     }
     
     const validPalavras = palavras.filter(p => p.trim().length > 0);
-    if (validPalavras.length < 20) {
-      toast({ title: "Erro", description: `Preencha todas as 20 palavras (${validPalavras.length}/20)`, variant: "destructive" });
+    if (validPalavras.length < MIN_PALAVRAS) {
+      toast({ title: "Erro", description: `Digite no mínimo ${MIN_PALAVRAS} palavras (${validPalavras.length}/${MIN_PALAVRAS})`, variant: "destructive" });
+      return;
+    }
+    if (validPalavras.length > MAX_PALAVRAS) {
+      toast({ title: "Erro", description: `Máximo de ${MAX_PALAVRAS} palavras permitidas`, variant: "destructive" });
       return;
     }
     
@@ -207,7 +214,7 @@ const ThemeWorkshopModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () 
   const resetForm = () => {
     setTitulo('');
     setAutor('');
-    setPalavras(Array(20).fill(''));
+    setPalavras(Array(MAX_PALAVRAS).fill(''));
     setIsPublic(true);
     setPayment({ status: 'idle' });
   };
@@ -307,7 +314,7 @@ const ThemeWorkshopModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () 
                 <>
                   <div className="bg-[#16213e]/50 rounded-xl p-3 border border-[#3d4a5c]">
                     <p className="text-sm text-gray-300 mb-2">
-                      Crie seu proprio tema com 20 palavras personalizadas!
+                      Crie seu proprio tema com {MIN_PALAVRAS} a {MAX_PALAVRAS} palavras personalizadas!
                     </p>
                     <p className="text-xs text-[#e9c46a]">
                       Valor: R$ 3,00 via PIX
@@ -348,14 +355,22 @@ const ThemeWorkshopModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () 
                     
                     <div className="space-y-2">
                       <p className="text-sm text-gray-300 font-medium">
-                        20 Palavras ({palavras.filter(p => p.trim()).length}/20)
+                        Palavras ({palavras.filter(p => p.trim()).length}/{MIN_PALAVRAS}-{MAX_PALAVRAS})
+                        {palavras.filter(p => p.trim()).length >= MIN_PALAVRAS && (
+                          <span className="text-green-400 ml-2">
+                            <Check className="w-4 h-4 inline" />
+                          </span>
+                        )}
+                      </p>
+                      <p className="text-xs text-gray-400">
+                        Digite entre {MIN_PALAVRAS} e {MAX_PALAVRAS} palavras
                       </p>
                       <div className="grid grid-cols-2 gap-2 max-h-[200px] overflow-y-auto pr-2">
                         {palavras.map((palavra, i) => (
                           <input
                             key={i}
                             type="text"
-                            placeholder={`Palavra ${i + 1}`}
+                            placeholder={`Palavra ${i + 1}${i < MIN_PALAVRAS ? ' *' : ''}`}
                             value={palavra}
                             onChange={(e) => handlePalavraChange(i, e.target.value)}
                             maxLength={30}

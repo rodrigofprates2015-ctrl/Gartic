@@ -787,7 +787,7 @@ const HomeScreen = () => {
 
   return (
     <div 
-      className="min-h-screen w-full flex flex-col items-center justify-center relative"
+      className="min-h-screen w-full flex flex-col items-center justify-center relative pt-20 md:pt-24"
       style={{
         backgroundImage: `url(${backgroundImg})`,
         backgroundSize: 'cover',
@@ -795,6 +795,17 @@ const HomeScreen = () => {
         backgroundRepeat: 'no-repeat'
       }}
     >
+      {/* Hero Banner - Oficina de Temas */}
+      <div 
+        className="hero-banner"
+        onClick={() => setIsThemeWorkshopOpen(true)}
+        data-testid="hero-banner-theme-workshop"
+      >
+        <p className="hero-banner-text-small">Divirta-se com os amigos</p>
+        <p className="hero-banner-text-main">Gere seu próprio tema</p>
+        <p className="hero-banner-text-price">Por apenas R$ 3,00</p>
+      </div>
+
       {/* Left AdSense Banner - 160x600 */}
       <div className="hidden xl:block fixed left-2 top-1/2 -translate-y-1/2 z-30">
         <ins 
@@ -912,15 +923,6 @@ const HomeScreen = () => {
             </button>
           </div>
 
-          {/* Theme Workshop button */}
-          <button
-            onClick={() => setIsThemeWorkshopOpen(true)}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-[#6b4ba3] border-2 border-[#5a3d8a] rounded-xl text-white hover:bg-[#7b5bb3] transition-all font-semibold shadow-lg mt-2"
-            data-testid="button-theme-workshop"
-          >
-            <FileText className="w-5 h-5" />
-            <span>Oficina de Temas</span>
-          </button>
         </div>
       </div>
 

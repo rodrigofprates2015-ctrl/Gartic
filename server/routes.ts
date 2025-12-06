@@ -6,6 +6,7 @@ import { type Player, type GameModeType, type GameData } from "@shared/schema";
 import { z } from "zod";
 import { randomBytes } from "crypto";
 import { setupAuth, isAuthenticated } from "./githubAuth";
+import { createPayment, type ThemeData } from "./paymentController";
 
 const GAME_MODES = {
   palavraSecreta: {
@@ -1451,6 +1452,54 @@ export async function registerRoutes(
       res.json(room);
     } catch (error) {
       res.status(400).json({ error: "Failed to get room" });
+    }
+  });
+
+  // Payment Routes - Mercado Pago PIX
+  const createPaymentSchema = z.object({
+    titulo: z.string().min(3, "Título deve ter pelo menos 3 caracteres").max(50, "Título deve ter no máximo 50 caracteres"),
+    palavras: z.array(z.string().min(1)).length(20, "Deve ter exatamente 20 palavras"),
+    autor: z.string().min(2, "Nome do autor deve ter pelo menos 2 caracteres").max(30, "Nome do autor deve ter no máximo 30 caracteres"),
+    isPublic: z.boolean().optional().default(true)
+  });
+
+  app.post("/api/payments/create", async (req, res) => {
+    try {
+      const validatedData = createPaymentSchema.parse(req.body);
+      
+      const themeData: ThemeData = {
+        titulo: validatedData.titulo,
+        palavras: validatedData.palavras,
+        autor: validatedData.autor,
+        isPublic: validatedData.isPublic
+      };
+      
+      const paymentResult = await createPayment(themeData);
+      
+      if (!paymentResult.success) {
+        return res.status(400).json({ 
+          error: paymentResult.error || "Falha ao criar pagamento" 
+        });
+      }
+      
+      res.json({
+        success: true,
+        paymentId: paymentResult.paymentId,
+        qrCode: paymentResult.qrCode,
+        qrCodeBase64: paymentResult.qrCodeBase64,
+        ticketUrl: paymentResult.ticketUrl,
+        expirationDate: paymentResult.expirationDate
+      });
+      
+    } catch (error: any) {
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ 
+          error: "Dados inválidos", 
+          details: error.errors 
+        });
+      }
+      console.error('[Payment Route] Error:', error);
+      res.status(500).json({ error: "Erro interno ao processar pagamento" });
     }
   });
 

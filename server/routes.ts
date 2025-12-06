@@ -6,7 +6,8 @@ import { type Player, type GameModeType, type GameData } from "@shared/schema";
 import { z } from "zod";
 import { randomBytes } from "crypto";
 import { setupAuth, isAuthenticated } from "./githubAuth";
-import { createPayment, type ThemeData } from "./paymentController";
+import { createPayment, getPaymentStatus, type ThemeData } from "./paymentController";
+import { randomBytes as cryptoRandomBytes } from "crypto";
 
 const GAME_MODES = {
   palavraSecreta: {
@@ -1500,6 +1501,92 @@ export async function registerRoutes(
       }
       console.error('[Payment Route] Error:', error);
       res.status(500).json({ error: "Erro interno ao processar pagamento" });
+    }
+  });
+
+  // Webhook - Mercado Pago Payment Notifications
+  app.post("/webhook", async (req, res) => {
+    try {
+      // Always respond 200 to prevent Mercado Pago from retrying
+      res.status(200).send('OK');
+      
+      const { type, data } = req.body;
+      
+      console.log('[Webhook] Received notification:', { type, data });
+      
+      // Only process payment notifications
+      if (type !== 'payment') {
+        console.log('[Webhook] Ignoring non-payment notification type:', type);
+        return;
+      }
+      
+      const paymentId = data?.id;
+      if (!paymentId) {
+        console.log('[Webhook] No payment ID in notification');
+        return;
+      }
+      
+      // Query payment status from Mercado Pago API
+      const paymentInfo = await getPaymentStatus(paymentId);
+      
+      console.log('[Webhook] Payment status:', paymentInfo.status, 'for ID:', paymentId);
+      
+      // Only process approved payments
+      if (paymentInfo.status !== 'approved') {
+        console.log('[Webhook] Payment not approved, status:', paymentInfo.status);
+        return;
+      }
+      
+      // Get theme data from metadata
+      const metadata = paymentInfo.metadata;
+      if (!metadata) {
+        console.error('[Webhook] No metadata found in payment');
+        return;
+      }
+      
+      const titulo = metadata.titulo;
+      const autor = metadata.autor;
+      const isPublic = metadata.is_public ?? metadata.isPublic ?? true;
+      
+      // Parse palavras (stored as JSON string in metadata)
+      let palavras: string[];
+      try {
+        palavras = typeof metadata.palavras === 'string' 
+          ? JSON.parse(metadata.palavras) 
+          : metadata.palavras;
+      } catch (e) {
+        console.error('[Webhook] Failed to parse palavras from metadata:', e);
+        return;
+      }
+      
+      if (!titulo || !autor || !palavras || !Array.isArray(palavras)) {
+        console.error('[Webhook] Invalid theme data in metadata:', { titulo, autor, palavras });
+        return;
+      }
+      
+      // Generate access code for the theme
+      const accessCode = cryptoRandomBytes(3).toString('hex').toUpperCase();
+      
+      // Save theme to database
+      const theme = await storage.createTheme({
+        titulo,
+        autor,
+        palavras,
+        isPublic,
+        accessCode,
+        paymentStatus: 'approved',
+        approved: true
+      });
+      
+      console.log('[Webhook] Theme created successfully:', {
+        id: theme.id,
+        titulo: theme.titulo,
+        accessCode: theme.accessCode
+      });
+      
+    } catch (error) {
+      console.error('[Webhook] Error processing notification:', error);
+      // Don't throw - we already sent 200 to avoid retries
     }
   });
 

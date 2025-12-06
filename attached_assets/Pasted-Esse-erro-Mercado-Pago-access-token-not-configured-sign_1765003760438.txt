@@ -1,0 +1,43 @@
+Esse erro "Mercado Pago access token not configured" significa que o seu código está pronto para vender, mas você esqueceu de entregar a "chave do cofre" para o Replit. O sistema não sabe em qual conta do Mercado Pago ele deve gerar o Pix.
+
+Isso é um problema de configuração de Variável de Ambiente (Secrets), não de código quebrado.
+
+Como resolver agora (Passo a Passo)
+Você precisa pegar o Access Token no Mercado Pago e colar no Replit.
+
+1. Pegue a Chave (Access Token)
+Acesse o site: Mercado Pago Developers.
+
+Faça login e vá em "Suas Integrações".
+
+Crie uma nova aplicação (dê o nome de "TikJogos").
+
+No menu lateral esquerdo, vá em "Credenciais de Produção".
+
+Copie o código enorme que está no campo "Access Token" (geralmente começa com APP_USR- ou TEST-).
+
+2. Configure no Replit (Secrets)
+Volte para o seu projeto no Replit.
+
+No menu lateral esquerdo, procure pelo ícone de um Cadeado (Secrets/Environment Variables).
+
+Na caixa "Key" (Chave), digite exatamente: MERCADO_PAGO_ACCESS_TOKEN
+
+Na caixa "Value" (Valor), cole o código que você copiou do Mercado Pago.
+
+Clique no botão "Add new secret".
+
+Importante: Pare (Stop) e Inicie (Run) o servidor novamente para ele carregar a chave nova.
+
+Prompt de Correção (Caso o erro persista)
+Se você fez tudo isso e o erro continuar, pode ser que o nome da variável no código esteja diferente do nome no segredo. Use este prompt para pedir ao Replit que verifique e corrija a conexão:
+
+Copie e cole isso na IA do Replit:
+
+"Estou recebendo o erro 'Mercado Pago access token not configured' ao tentar gerar o Pix.
+
+Verifique no meu código de backend (provavelmente no paymentController.js ou server.js) qual é o nome EXATO da variável de ambiente que você está tentando ler. É MERCADO_PAGO_ACCESS_TOKEN ou outro nome?
+
+Adicione um console.log no início da inicialização do servidor para me mostrar se a chave foi carregada corretamente ou se está undefined.
+
+Certifique-se de que a inicialização da SDK do Mercado Pago está sendo feita APÓS o carregamento das variáveis de ambiente (dotenv)."

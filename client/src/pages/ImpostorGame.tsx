@@ -317,7 +317,7 @@ const ThemeWorkshopModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () 
                       Crie seu proprio tema com {MIN_PALAVRAS} a {MAX_PALAVRAS} palavras personalizadas!
                     </p>
                     <p className="text-xs text-[#e9c46a]">
-                      Valor: R$ 0,01 via PIX
+                      Valor: R$ 1,50 via PIX
                     </p>
                   </div>
                   
@@ -393,7 +393,7 @@ const ThemeWorkshopModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () 
                     ) : (
                       <>
                         <Zap size={20} />
-                        GERAR PIX (R$ 0,01)
+                        GERAR PIX (R$ 1,50)
                       </>
                     )}
                   </button>
@@ -662,27 +662,7 @@ const GameNavButtons = ({
 
 const TopRightButtons = ({ onDonateClick }: { onDonateClick: () => void }) => (
   <>
-    {/* Mobile: Como Jogar and Discord on left */}
-    <div className="sm:hidden fixed top-4 left-4 z-[60] flex items-center gap-2">
-      <Link 
-        href="/comojogar"
-        className="flex items-center gap-2 px-3 py-2 bg-[#4a90a4] border-2 border-[#3a7084] rounded-xl text-white hover:bg-[#5aa0b4] transition-all font-semibold shadow-lg"
-        data-testid="button-how-to-play-mobile"
-      >
-        <HelpCircle className="w-4 h-4" />
-      </Link>
-      <a
-        href="https://discord.gg/rhZxA2ha"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="flex items-center gap-2 px-3 py-2 bg-[#5865F2] border-2 border-[#4752C4] rounded-xl text-white hover:bg-[#6875F3] transition-all font-semibold shadow-lg"
-        data-testid="button-discord-mobile"
-      >
-        <SiDiscord className="w-4 h-4" />
-      </a>
-    </div>
-    
-    {/* Desktop: All buttons on right */}
+    {/* Desktop: All buttons on right - fixed position */}
     <div className="hidden sm:flex fixed top-4 right-4 z-[60] items-center gap-2">
       <Link 
         href="/comojogar"
@@ -711,17 +691,35 @@ const TopRightButtons = ({ onDonateClick }: { onDonateClick: () => void }) => (
         <span className="text-sm font-medium">Doar</span>
       </button>
     </div>
-    
-    {/* Mobile: Doar on right */}
+  </>
+);
+
+const MobileActionButtons = ({ onDonateClick }: { onDonateClick: () => void }) => (
+  <div className="sm:hidden flex items-center justify-center gap-2 w-full mb-3">
+    <Link 
+      href="/comojogar"
+      className="flex items-center gap-2 px-3 py-2 bg-[#4a90a4] border-2 border-[#3a7084] rounded-xl text-white hover:bg-[#5aa0b4] transition-all font-semibold shadow-lg"
+      data-testid="button-how-to-play-mobile"
+    >
+      <HelpCircle className="w-4 h-4" />
+    </Link>
+    <a
+      href="https://discord.gg/rhZxA2ha"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="flex items-center gap-2 px-3 py-2 bg-[#5865F2] border-2 border-[#4752C4] rounded-xl text-white hover:bg-[#6875F3] transition-all font-semibold shadow-lg"
+      data-testid="button-discord-mobile"
+    >
+      <SiDiscord className="w-4 h-4" />
+    </a>
     <button
       onClick={onDonateClick}
-      className="sm:hidden fixed top-4 right-4 z-[60] flex items-center gap-2 px-4 py-2 bg-[#c44536] border-2 border-[#a33526] rounded-xl text-white hover:bg-[#d45546] transition-all font-semibold shadow-lg"
+      className="flex items-center gap-2 px-3 py-2 bg-[#c44536] border-2 border-[#a33526] rounded-xl text-white hover:bg-[#d45546] transition-all font-semibold shadow-lg"
       data-testid="button-donate-mobile"
     >
       <Heart className="w-4 h-4 fill-current" />
-      <span className="text-sm font-medium">Doar</span>
     </button>
-  </>
+  </div>
 );
 
 
@@ -810,7 +808,7 @@ const HomeScreen = () => {
       >
         <p className="hero-banner-text-small">Divirta-se com os amigos</p>
         <p className="hero-banner-text-main">Crie seu próprio tema</p>
-        <p className="hero-banner-text-price">Por apenas R$ 0,01</p>
+        <p className="hero-banner-text-price">Por apenas R$ 1,50</p>
       </Link>
 
       {/* Left AdSense Banner - 160x600 */}
@@ -848,6 +846,9 @@ const HomeScreen = () => {
         alt="Impostor" 
         className="hidden md:block absolute bottom-16 right-[18%] lg:right-[22%] xl:right-[26%] h-[42vh] max-h-[420px] object-contain z-10"
       />
+
+      {/* Mobile action buttons - above the card */}
+      <MobileActionButtons onDonateClick={() => setIsDonationOpen(true)} />
 
       {/* Main card */}
       <div className="main-card w-[90%] max-w-md p-5 md:p-6 z-20 animate-fade-in">

@@ -67,7 +67,7 @@ export async function createPayment(themeData: ThemeData): Promise<PaymentRespon
     console.log('[Payment] Creating payment with notification_url:', notificationUrl);
     
     const paymentData: any = {
-      transaction_amount: 1.50,
+      transaction_amount: 0.01, // TESTE: Valor temporário de 1 centavo para testes
       description: `Tema Personalizado: ${themeData.titulo}`,
       payment_method_id: 'pix',
       payer: {

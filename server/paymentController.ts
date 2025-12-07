@@ -2,13 +2,25 @@ import { MercadoPagoConfig, Payment } from 'mercadopago';
 
 let _client: MercadoPagoConfig | null = null;
 let _payment: Payment | null = null;
+let _lastToken: string | null = null;
+
+function getCleanAccessToken(): string {
+  let token = process.env.MERCADOPAGO_ACCESS_TOKEN || '';
+  token = token.trim().replace(/^=+/, '');
+  return token;
+}
 
 function getPaymentClient(): Payment {
-  if (!_client) {
+  const currentToken = getCleanAccessToken();
+  
+  if (!_client || _lastToken !== currentToken) {
     _client = new MercadoPagoConfig({
-      accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN || '',
+      accessToken: currentToken,
     });
+    _payment = new Payment(_client);
+    _lastToken = currentToken;
   }
+  
   if (!_payment) {
     _payment = new Payment(_client);
   }

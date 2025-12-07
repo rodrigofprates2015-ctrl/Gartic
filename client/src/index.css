@@ -432,67 +432,83 @@
 
   /* Hero Banner - Oficina de Temas */
   .hero-banner {
-    background-color: #e5486f;
-    padding: 1rem 1.5rem;
-    text-align: center;
+    padding: 0;
+    text-align: left;
     width: 100%;
     position: fixed;
     top: 0;
     left: 0;
     z-index: 50;
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    transition: filter 0.2s ease;
+    overflow: hidden;
+    height: 80px;
   }
 
   .hero-banner:hover {
-    background-color: #d93d62;
+    filter: brightness(1.1);
+  }
+
+  .hero-banner-overlay {
+    background: linear-gradient(90deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.4) 50%, transparent 100%);
+    padding: 0.75rem 1.5rem;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
 
   .hero-banner-text-small {
     font-family: var(--font-gt-america-medium);
-    font-size: 0.875rem;
+    font-size: 0.75rem;
     font-weight: 500;
     font-style: italic;
     color: white;
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.125rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
   }
 
   .hero-banner-text-main {
     font-family: var(--font-gt-america);
-    font-size: 1.75rem;
+    font-size: 1.25rem;
     font-weight: 700;
     font-style: italic;
-    color: #511a27;
+    color: white;
     line-height: 1.1;
     text-transform: uppercase;
     letter-spacing: 0.02em;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.6);
   }
 
   .hero-banner-text-price {
     font-family: var(--font-gt-america-medium);
-    font-size: 0.875rem;
+    font-size: 0.75rem;
     font-weight: 500;
     font-style: italic;
-    color: white;
-    margin-top: 0.25rem;
+    color: #ffd700;
+    margin-top: 0.125rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
   }
 
   @media (min-width: 768px) {
     .hero-banner {
-      padding: 1.25rem 2rem;
+      height: 100px;
+    }
+    .hero-banner-overlay {
+      padding: 1rem 2rem;
     }
     .hero-banner-text-small {
-      font-size: 1rem;
+      font-size: 0.875rem;
     }
     .hero-banner-text-main {
-      font-size: 2.5rem;
+      font-size: 1.75rem;
     }
     .hero-banner-text-price {
-      font-size: 1rem;
+      font-size: 0.875rem;
     }
   }
 }

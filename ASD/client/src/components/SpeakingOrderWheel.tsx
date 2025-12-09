@@ -8,9 +8,10 @@ interface SpeakingOrderWheelProps {
   onComplete: (order: string[]) => void;
   isSpinning?: boolean;
   serverOrder?: string[] | null;
+  playerMap?: Record<string, string> | null;
 }
 
-export function SpeakingOrderWheel({ players, onComplete, isSpinning = true, serverOrder }: SpeakingOrderWheelProps) {
+export function SpeakingOrderWheel({ players, onComplete, isSpinning = true, serverOrder, playerMap }: SpeakingOrderWheelProps) {
   const [rotation, setRotation] = useState(0);
   const [isComplete, setIsComplete] = useState(false);
   const [speakingOrder, setSpeakingOrder] = useState<string[]>([]);
@@ -47,7 +48,14 @@ export function SpeakingOrderWheel({ players, onComplete, isSpinning = true, ser
   }, [isSpinning, isComplete, players, onComplete, serverOrder]);
 
   const displayOrder = speakingOrder.length > 0 
-    ? speakingOrder.map(uid => players.find(p => p.uid === uid)?.name || 'Desconhecido')
+    ? speakingOrder.map(uid => {
+        // First try playerMap from server (most reliable)
+        if (playerMap && playerMap[uid]) {
+          return playerMap[uid];
+        }
+        // Fallback to local players array
+        return players.find(p => p.uid === uid)?.name || 'Jogador';
+      })
     : [];
 
   return (

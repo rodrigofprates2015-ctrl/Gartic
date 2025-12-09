@@ -18,10 +18,11 @@ export type RoundStage =
 interface SpeakingOrderStageProps {
   players: Player[];
   serverOrder?: string[] | null;
+  playerMap?: Record<string, string> | null;
   onComplete: (order: string[]) => void;
 }
 
-export function SpeakingOrderStage({ players, serverOrder, onComplete }: SpeakingOrderStageProps) {
+export function SpeakingOrderStage({ players, serverOrder, playerMap, onComplete }: SpeakingOrderStageProps) {
   const [rotation, setRotation] = useState(0);
   const [isComplete, setIsComplete] = useState(false);
   const [speakingOrder, setSpeakingOrder] = useState<string[]>([]);
@@ -58,7 +59,14 @@ export function SpeakingOrderStage({ players, serverOrder, onComplete }: Speakin
   }, [isComplete, players, onComplete, serverOrder]);
 
   const displayOrder = speakingOrder.length > 0 
-    ? speakingOrder.map(uid => players.find(p => p.uid === uid)?.name || 'Desconhecido')
+    ? speakingOrder.map(uid => {
+        // First try playerMap from server (most reliable)
+        if (playerMap && playerMap[uid]) {
+          return playerMap[uid];
+        }
+        // Fallback to local players array
+        return players.find(p => p.uid === uid)?.name || 'Jogador';
+      })
     : [];
 
   return (
@@ -116,6 +124,7 @@ export function SpeakingOrderStage({ players, serverOrder, onComplete }: Speakin
 interface SpeakingOrderWithVotingStageProps {
   players: Player[];
   serverOrder?: string[] | null;
+  playerMap?: Record<string, string> | null;
   userId: string;
   isHost: boolean;
   onStartVoting: () => void;
@@ -126,7 +135,8 @@ interface SpeakingOrderWithVotingStageProps {
 
 export function SpeakingOrderWithVotingStage({ 
   players, 
-  serverOrder, 
+  serverOrder,
+  playerMap,
   userId,
   isHost,
   onStartVoting,
@@ -170,8 +180,13 @@ export function SpeakingOrderWithVotingStage({
   }, [isSpinComplete, players, serverOrder]);
 
   const displayOrder = speakingOrder.map(uid => {
+    // First try playerMap from server (most reliable)
+    if (playerMap && playerMap[uid]) {
+      return { uid, name: playerMap[uid] };
+    }
+    // Fallback to local players array
     const player = players.find(p => p.uid === uid);
-    return { uid, name: player?.name || 'Desconhecido' };
+    return { uid, name: player?.name || 'Jogador' };
   });
 
   return (

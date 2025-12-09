@@ -843,15 +843,20 @@ export async function registerRoutes(
           
           if (room && room.players) {
             // Generate random speaking order on the server so all clients get the same order
-            // Include ALL active players in the speaking order, not just 3
-            const activePlayers = room.players.filter(p => !p.waitingForGame);
+            // Include ALL connected players in the speaking order (ignore waitingForGame - they're in game now)
+            // Only exclude players who are explicitly disconnected
+            const activePlayers = room.players.filter(p => p.connected !== false);
             const shuffled = [...activePlayers].sort(() => Math.random() - 0.5);
             const speakingOrder = shuffled.map(p => p.uid);
+            
+            // Also send the full player list for name resolution
+            const playerMap = Object.fromEntries(room.players.map(p => [p.uid, p.name]));
             
             // Broadcast to all players with the same order
             broadcastToRoom(roomCode, { 
               type: 'start-speaking-order-wheel',
-              speakingOrder 
+              speakingOrder,
+              playerMap
             });
           }
         }

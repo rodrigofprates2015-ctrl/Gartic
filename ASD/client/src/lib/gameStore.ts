@@ -82,6 +82,7 @@ export type GameState = {
   isDisconnected: boolean;
   savedNickname: string | null;
   speakingOrder: string[] | null;
+  speakingOrderPlayerMap: Record<string, string> | null;
   showSpeakingOrderWheel: boolean;
   
   setUser: (name: string) => void;
@@ -128,6 +129,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   isDisconnected: false,
   savedNickname: null,
   speakingOrder: null,
+  speakingOrderPlayerMap: null,
   showSpeakingOrderWheel: false,
 
   setUser: (name: string) => {
@@ -418,6 +420,10 @@ export const useGameStore = create<GameState>((set, get) => ({
           if (data.speakingOrder) {
             set({ speakingOrder: data.speakingOrder });
           }
+          // Store playerMap for name resolution if provided
+          if (data.playerMap) {
+            set({ speakingOrderPlayerMap: data.playerMap });
+          }
           get().setShowSpeakingOrderWheel(true);
         }
       } catch (error) {
@@ -491,10 +497,20 @@ export const useGameStore = create<GameState>((set, get) => ({
       newStatus = 'playing';
     }
     
-    // Reset selectedMode when room is reset to waiting (Nova Rodada)
+    // Reset selectedMode and speaking order state when room is reset to waiting (Nova Rodada)
     if (validatedRoom.status === 'waiting') {
       selectedMode = null;
       console.log('updateRoom: Room reset to waiting, setting status to lobby');
+      set({ 
+        room: validatedRoom,
+        status: newStatus,
+        enteredDuringGame,
+        selectedMode,
+        speakingOrder: null,
+        speakingOrderPlayerMap: null,
+        showSpeakingOrderWheel: false
+      });
+      return;
     }
 
     console.log('updateRoom: Setting new status to:', newStatus);
@@ -645,7 +661,10 @@ export const useGameStore = create<GameState>((set, get) => ({
         set({ 
           selectedMode: null,
           status: 'lobby',
-          room: updatedRoom
+          room: updatedRoom,
+          speakingOrder: null,
+          speakingOrderPlayerMap: null,
+          showSpeakingOrderWheel: false
         });
         console.log('returnToLobby: Successfully reset room and status to lobby');
 
@@ -682,7 +701,10 @@ export const useGameStore = create<GameState>((set, get) => ({
       set({ 
         selectedMode: null,
         status: 'lobby',
-        room: updatedRoom
+        room: updatedRoom,
+        speakingOrder: null,
+        speakingOrderPlayerMap: null,
+        showSpeakingOrderWheel: false
       });
       console.log('leaveCurrentGame: Successfully left game and returned to lobby');
 
@@ -780,6 +802,9 @@ export const useGameStore = create<GameState>((set, get) => ({
     
     // Only host can trigger
     if (room.hostId !== user.uid) return;
+    
+    // Clear stale speaking order data before triggering new wheel
+    set({ speakingOrder: null, speakingOrderPlayerMap: null });
     
     // Send message to server to broadcast to all players
     ws.send(JSON.stringify({

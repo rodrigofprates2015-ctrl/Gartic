@@ -2159,7 +2159,7 @@ const PerguntasDiferentesScreen = () => {
 type RoundStage = 'WORD_REVEAL' | 'SPEAKING_ORDER' | 'VOTING' | 'VOTING_FEEDBACK' | 'ROUND_RESULT';
 
 const GameScreen = () => {
-  const { user, room, returnToLobby, speakingOrder, setSpeakingOrder, showSpeakingOrderWheel, setShowSpeakingOrderWheel, triggerSpeakingOrderWheel } = useGameStore();
+  const { user, room, returnToLobby, speakingOrder, speakingOrderPlayerMap, setSpeakingOrder, showSpeakingOrderWheel, setShowSpeakingOrderWheel, triggerSpeakingOrderWheel } = useGameStore();
   const [isRevealed, setIsRevealed] = useState(true);
   const [isSubmittingVote, setIsSubmittingVote] = useState(false);
 
@@ -2403,6 +2403,7 @@ const GameScreen = () => {
           <SpeakingOrderWithVotingStage
             players={activePlayers}
             serverOrder={speakingOrder}
+            playerMap={speakingOrderPlayerMap}
             userId={user?.uid || ''}
             isHost={isHost}
             onStartVoting={handleStartVoting}

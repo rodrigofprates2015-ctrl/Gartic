@@ -809,7 +809,7 @@ const HomeScreen = () => {
 
   return (
     <div 
-      className="min-h-screen w-full flex flex-col items-center justify-center relative pt-20 md:pt-24"
+      className="min-h-screen w-full flex flex-col relative"
       style={{
         backgroundImage: `url(${backgroundImg})`,
         backgroundSize: 'cover',
@@ -856,105 +856,108 @@ const HomeScreen = () => {
       <img 
         src={tripulanteImg} 
         alt="Tripulante" 
-        className="hidden md:block absolute bottom-16 left-[18%] lg:left-[22%] xl:left-[26%] h-[42vh] max-h-[420px] object-contain z-10"
+        className="hidden md:block absolute bottom-32 left-[18%] lg:left-[22%] xl:left-[26%] h-[42vh] max-h-[420px] object-contain z-10"
       />
 
       {/* Impostor character - right side (desktop only) */}
       <img 
         src={impostorImg} 
         alt="Impostor" 
-        className="hidden md:block absolute bottom-16 right-[18%] lg:right-[22%] xl:right-[26%] h-[42vh] max-h-[420px] object-contain z-10"
+        className="hidden md:block absolute bottom-32 right-[18%] lg:right-[22%] xl:right-[26%] h-[42vh] max-h-[420px] object-contain z-10"
       />
 
-      {/* Mobile action buttons - above the card */}
-      <MobileActionButtons onDonateClick={() => setIsDonationOpen(true)} />
+      {/* Main content area - flex-grow to push footer down */}
+      <div className="flex-1 flex flex-col items-center justify-center pt-20 md:pt-24 px-4 relative z-20">
+        {/* Mobile action buttons - above the card */}
+        <MobileActionButtons onDonateClick={() => setIsDonationOpen(true)} />
 
-      {/* Main card */}
-      <div className="main-card w-[90%] max-w-md p-5 md:p-6 z-20 animate-fade-in">
-        {/* Impostor logo with characters */}
-        <div className="flex justify-center mb-3">
-          <img src={logoImpostor} alt="Impostor" className="h-28 md:h-36 object-contain" />
-        </div>
-
-        {/* Form */}
-        <div className="space-y-3">
-          {/* Nickname input */}
-          <input
-            type="text"
-            placeholder="Seu nickname"
-            value={name}
-            onChange={(e) => setNameInput(e.target.value)}
-            className="input-dark"
-            data-testid="input-name"
-          />
-
-          {/* Create room button */}
-          <button 
-            onClick={handleCreate} 
-            disabled={isLoading}
-            className="btn-orange w-full"
-            data-testid="button-create-room"
-          >
-            {isLoading ? <Loader2 className="animate-spin" /> : <Zap size={20} />}
-            CRIAR SALA
-          </button>
-
-          {/* Save nickname checkbox */}
-          <div className="flex items-center justify-between px-1">
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={saveNicknameChecked}
-                onChange={(e) => setSaveNicknameChecked(e.target.checked)}
-                className="w-4 h-4 rounded bg-[#1a2a3a] border-2 border-[#4a6a8a] cursor-pointer accent-[#e8a045]"
-                data-testid="checkbox-save-nickname"
-              />
-              <span className="text-sm text-[#8aa0b0]">Guardar nickname</span>
-            </label>
-            {savedNickname && (
-              <button
-                onClick={handleClearNickname}
-                className="text-xs text-[#6a8aaa] hover:text-white transition-colors underline"
-                data-testid="button-clear-nickname"
-              >
-                Limpar
-              </button>
-            )}
+        {/* Main card */}
+        <div className="main-card w-[90%] max-w-md p-5 md:p-6 animate-fade-in">
+          {/* Impostor logo with characters */}
+          <div className="flex justify-center mb-3">
+            <img src={logoImpostor} alt="Impostor" className="h-28 md:h-36 object-contain" />
           </div>
 
-          {/* OR divider */}
-          <div className="flex items-center gap-4 py-2">
-            <div className="flex-1 h-px bg-[#4a6a8a]"></div>
-            <span className="text-[#8aa0b0] text-sm font-bold">OU</span>
-            <div className="flex-1 h-px bg-[#4a6a8a]"></div>
-          </div>
-
-          {/* Code input and Enter button */}
-          <div className="flex gap-3">
+          {/* Form */}
+          <div className="space-y-3">
+            {/* Nickname input */}
             <input
               type="text"
-              placeholder="CÓDIGO"
-              value={code}
-              onChange={(e) => setCodeInput(e.target.value.toUpperCase())}
-              maxLength={4}
-              className="input-code flex-1"
-              data-testid="input-room-code"
+              placeholder="Seu nickname"
+              value={name}
+              onChange={(e) => setNameInput(e.target.value)}
+              className="input-dark"
+              data-testid="input-name"
             />
-            <button 
-              onClick={handleJoin}
-              disabled={isLoading}
-              className="btn-green"
-              data-testid="button-join-room"
-            >
-              ENTRAR
-            </button>
-          </div>
 
+            {/* Create room button */}
+            <button 
+              onClick={handleCreate} 
+              disabled={isLoading}
+              className="btn-orange w-full"
+              data-testid="button-create-room"
+            >
+              {isLoading ? <Loader2 className="animate-spin" /> : <Zap size={20} />}
+              CRIAR SALA
+            </button>
+
+            {/* Save nickname checkbox */}
+            <div className="flex items-center justify-between px-1">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={saveNicknameChecked}
+                  onChange={(e) => setSaveNicknameChecked(e.target.checked)}
+                  className="w-4 h-4 rounded bg-[#1a2a3a] border-2 border-[#4a6a8a] cursor-pointer accent-[#e8a045]"
+                  data-testid="checkbox-save-nickname"
+                />
+                <span className="text-sm text-[#8aa0b0]">Guardar nickname</span>
+              </label>
+              {savedNickname && (
+                <button
+                  onClick={handleClearNickname}
+                  className="text-xs text-[#6a8aaa] hover:text-white transition-colors underline"
+                  data-testid="button-clear-nickname"
+                >
+                  Limpar
+                </button>
+              )}
+            </div>
+
+            {/* OR divider */}
+            <div className="flex items-center gap-4 py-2">
+              <div className="flex-1 h-px bg-[#4a6a8a]"></div>
+              <span className="text-[#8aa0b0] text-sm font-bold">OU</span>
+              <div className="flex-1 h-px bg-[#4a6a8a]"></div>
+            </div>
+
+            {/* Code input and Enter button */}
+            <div className="flex gap-3">
+              <input
+                type="text"
+                placeholder="CÓDIGO"
+                value={code}
+                onChange={(e) => setCodeInput(e.target.value.toUpperCase())}
+                maxLength={4}
+                className="input-code flex-1"
+                data-testid="input-room-code"
+              />
+              <button 
+                onClick={handleJoin}
+                disabled={isLoading}
+                className="btn-green"
+                data-testid="button-join-room"
+              >
+                ENTRAR
+              </button>
+            </div>
+
+          </div>
         </div>
       </div>
 
-      {/* Footer */}
-      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-center z-20 max-w-md px-4">
+      {/* Footer - now below the content, takes full width */}
+      <div className="w-full text-center py-6 px-4 bg-gradient-to-t from-black/40 to-transparent z-20 relative border-t border-[#3d4a5c]/30">
         <img src={logoTikjogos} alt="TikJogos" className="h-4 md:h-5 mx-auto mb-2" />
         <p className="text-[#6a8aaa] text-xs">
           Desenvolvido com <Heart className="inline w-3 h-3 text-gray-500 fill-current" /> por <span className="text-[#8aa0b0]">Rodrigo Freitas</span>
@@ -968,7 +971,7 @@ const HomeScreen = () => {
             Termos
           </Link>
         </div>
-        <p className="text-[#4a6a8a] text-[10px] mt-2 leading-relaxed">
+        <p className="text-[#4a6a8a] text-[10px] mt-2 leading-relaxed max-w-md mx-auto">
           O TikJogos é um projeto independente de fãs. Todas as marcas registradas (como nomes de personagens e franquias) pertencem aos seus respectivos proprietários e são usadas aqui apenas para fins de referência em contexto de jogo de palavras/trivia.
         </p>
       </div>

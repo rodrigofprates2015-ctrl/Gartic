@@ -464,9 +464,9 @@ export async function registerRoutes(
   app: Express
 ): Promise<Server> {
 
-  // Serve ads.txt for Google AdSense verification
+  // Redirect ads.txt to Ezoic AdsManager
   app.get("/ads.txt", (_req, res) => {
-    res.type("text/plain").send("google.com, pub-9927561573478881, DIRECT, f08c47fec0942fa0");
+    res.redirect(301, "https://srv.adstxtmanager.com/19390/https%3A%2F%2Ftikjogos.com.br%2F.com");
   });
 
   // Serve version info

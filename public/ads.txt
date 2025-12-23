@@ -1,0 +1,2 @@
+# Ezoic Publisher ID
+ezoic.com, 12345, RESELLER, 6295aff7a21ce91e

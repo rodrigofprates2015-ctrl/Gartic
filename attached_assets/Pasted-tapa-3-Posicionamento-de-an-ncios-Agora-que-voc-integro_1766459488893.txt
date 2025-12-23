@@ -1,0 +1,167 @@
+tapa 3: Posicionamento de anúncios
+Agora que você integrou os scripts da Ezoic e configurou seu arquivo ads.txt, é hora de adicionar espaços publicitários ao seu site. Esta etapa final dará início à exibição de anúncios e à geração de receita.
+
+Crie seus espaços publicitários 🔗
+Primeiro, você precisará criar espaços publicitários no seu painel de controle do Ezoic. Esses espaços definem onde os anúncios serão exibidos no seu site.
+
+Você pode criar seus próprios anúncios no Painel de Controle da Ezoic ou trabalhar com seu Especialista em Integração da Ezoic para obter recomendações de posicionamento otimizadas.
+
+Adicione o código de posicionamento ao seu site 🔗
+Depois de obter os IDs de posicionamento dos seus anúncios, adicione este código onde você deseja que os anúncios apareçam no seu site:
+
+<div id="ezoic-pub-ad-placeholder-101"></div>
+<script>
+    ezstandalone.cmd.push(function () {
+        ezstandalone.showAds(101);
+    });
+</script>
+html
+Substitua 101pelo seu ID de posicionamento real do painel de controle. Insira este código para cada local de anúncio em seu site.
+
+Páginas com múltiplos posicionamentos devem passar todos os IDs de posicionamento em uma única showAds()chamada. Isso reduz as requisições ao servidor e melhora a velocidade de carregamento.
+
+Exemplo:ezstandalone.showAds(101, 102, 103, 104)
+
+NÃO adicione nenhum estilo ao espaço reservado (placeholder) div.
+
+Adicionar estilos ou reservar espaço para o anúncio pode resultar em espaço em branco vazio caso o anúncio não seja carregado.
+
+Chamar ezstandalone.showAds()a função sem definir um valor de espaço reservado fará com que ela seja executada para todos os espaços reservados existentes na página.
+Importante: Para garantir que os anúncios da Ezoic funcionem corretamente no seu site, não se esqueça de remover qualquer código de anúncio remanescente de outras redes de publicidade.
+Configuração concluída 🔗
+Após concluir essas etapas, você terá implementado com sucesso o EzoicAds em seu site. Caso tenha alguma dúvida ou precise de ajuda, entre em contato com a equipe de suporte da Ezoic.
+
+
+Conteúdo dinâmico
+Esta seção destina-se a sites cujo conteúdo carrega ou muda dinamicamente.
+
+Mudando de Página 🔗
+Ao alternar dinamicamente entre visualizações de página, é importante relembrar
+
+ezstandalone.showAds();
+javascript
+ezstandalone.showAds()Chamar essa função após uma alteração na URL forçará a atualização dos anúncios na nova página.
+
+Novo conteúdo 🔗
+Para adicionar espaços reservados adicionais na mesma visualização de página, você pode usar a ezstandalone.showAdsfunção.
+
+Se um usuário rolar a página para baixo, novo conteúdo será carregado e espaços reservados (placeholders) 104serão 105adicionados ezstandalone.showAdspara exibi-lo.
+
+<script>
+    ezstandalone.cmd.push(function () {
+        // call new placeholders
+        ezstandalone.showAds(104, 105);
+    });
+</script>
+html
+Alterando conteúdo 🔗
+Se o conteúdo for alterado na mesma visualização de página e um espaço reservado não for mais necessário ou visível, o espaço reservado precisa ser devidamente removido usando o método `cleanup()` ezstandalone.destroyPlaceholders. Isso permite que o espaço reservado seja carregado novamente, ezstandalone.showAdsse necessário.
+
+<script>
+    window.ezstandalone.cmd.push(function () {
+        // destroy placeholders
+        ezstandalone.destroyPlaceholders(104, 105);
+    });
+</script>
+html
+Rolagem infinita 🔗
+Para sites que implementam rolagem infinita, uma combinação de chamadas ezstandalone.destroyPlaceholdersseguida de ezstandalone.showAdspode ser necessária para reutilizar espaços reservados dentro da mesma visualização de página.
+
+Recomenda-se criar um conjunto de in-contentmarcadores específicos para rolagem infinita.
+Exemplo 🔗
+O exemplo abaixo mostra como seria o fluxo de rolagem infinita em um site com vários artigos.
+
+Comece por chamar o espaço reservado para o primeiro artigo ao carregar a página.
+
+<script>
+    window.ezstandalone = window.ezstandalone || {};
+    ezstandalone.cmd = ezstandalone.cmd || [];
+    ezstandalone.cmd.push(function () {
+        ezstandalone.showAds(102, 103, 104);
+    });
+</script>
+html
+O usuário então rola a página para o próximo artigo, e o próximo conjunto de anúncios é carregado.
+
+<script>
+    window.ezstandalone.cmd.push(function () {
+        // call new placeholders
+        ezstandalone.showAds(105, 106);
+    });
+</script>
+html
+O usuário então rola a página até o terceiro artigo, e os espaços reservados do primeiro artigo precisam ser reutilizados.
+
+<script>
+    window.ezstandalone.cmd.push(function () {
+        // destroy initial placeholders
+        ezstandalone.destroyPlaceholders(102, 103, 104);
+        // call new placeholders
+        ezstandalone.showAds(102, 103, 104);
+    });
+</script>
+html
+Se você deseja reutilizar IDs de espaço reservado, os espaços reservados iniciais devem ser removidos da página. Ter várias instâncias do mesmo ID de espaço reservado em uma página causará comportamento imprevisível dos anúncios.
+Removendo todos os espaços reservados 🔗
+Remova todos os espaços reservados da página usando a destroyAllfunção
+
+<script>
+    window.ezstandalone.cmd.push(function () {
+        ezstandalone.destroyAll();
+    });
+</script>
+html
+Mostrar todos os espaços reservados 🔗
+Você pode exibir anúncios em todos os espaços reservados de uma página usando a showAdsfunção, sem precisar definir nenhum valor.
+
+<script>
+    window.ezstandalone.cmd.push(function () {
+        ezstandalone.showAds();
+    });
+</script>
+html
+
+
+Solução de problemas
+Ao configurar o EzoicAds em seu site, é importante garantir que tudo esteja funcionando corretamente. Oferecemos um depurador de integração JavaScript integrado que permite diagnosticar rapidamente problemas com a configuração de seus anúncios. Abaixo, você encontrará um guia passo a passo sobre como usar esse depurador e interpretar suas saídas.
+
+Passo 1: Acione o depurador 🔗
+Para ativar o depurador, basta adicionar o seguinte parâmetro de consulta ao URL da página onde seus anúncios EzoicAds estão integrados:
+
+ez_js_debugger=1
+não definido
+Por exemplo:
+
+https://www.yourwebsite.com?ez_js_debugger=1
+não definido
+Após a adição do parâmetro de consulta e o carregamento da página, uma janela modal verde aparecerá na parte inferior central da tela. Este é o Depurador de Integração JavaScript.
+
+Etapa 2: Compreendendo a saída do depurador 🔗
+O modal do depurador contém várias informações importantes que ajudarão você a solucionar problemas de configuração. Aqui está um resumo das informações fornecidas:
+
+Script no <head>elemento da página : O depurador verifica a presença do script de integração do Ezoic ( sa.min.js) no <head>elemento da página. Isso garante que o script esteja posicionado de forma ideal para um carregamento eficiente da página.
+
+Consentimento : Esta seção verifica o uso das ferramentas de gerenciamento de consentimento da Ezoic, incluindo uma chamada de API ou a presença do script da Plataforma de Gerenciamento de Consentimento (CMP) na página. Essas verificações garantem que a privacidade do usuário seja gerenciada em conformidade com as regulamentações. Para obter mais informações sobre gerenciamento de privacidade, consulte a Documentação de Privacidade .
+
+As verificações do script CMP incluem a verificação de sua presença na página, seu posicionamento dentro do <head>elemento da página e a garantia de que ele aparece antes do script de integração do Ezoic ( sa.min.js) na estrutura HTML.
+Solicitação de anúncio : O depurador rastreia se uma solicitação de anúncio para os servidores da Ezoic foi enviada com sucesso e fornece detalhes importantes, como a contagem de palavras e o número máximo de anúncios permitidos.
+
+Esta seção inclui uma verificação de consistência da contagem de palavras para garantir que as solicitações de anúncios não sejam enviadas prematuramente — antes que o conteúdo principal da página tenha carregado completamente. Manter uma contagem de palavras consistente ajuda a verificar se o conteúdo dinâmico permanece estável, garantindo a exibição correta dos anúncios.
+Marcadores de posição definidos : Esta seção fornece informações detalhadas sobre os IDs dos marcadores de posição de anúncios usados ​​na última solicitação de rede para a Ezoic.
+
+Para cada ID, o depurador exibe o elemento HTML correspondente na página, se o ID foi selecionado para inserção de anúncio e o nome e tamanho da unidade de anúncio associada.
+Espaços Reservados Não Utilizados : Esta seção lista os IDs dos espaços reservados para anúncios que estão presentes no HTML da página, mas não foram incluídos na solicitação de rede mais recente para a Ezoic.
+
+Métodos da API Chamados : O depurador exibe cada método invocado na ezstandaloneAPI, mostrando-os na ordem de execução, juntamente com seus argumentos fornecidos. Esse rastreamento detalhado ajuda a identificar possíveis problemas de implementação.
+
+Etapa 3: Usando o depurador para solucionar problemas 🔗
+As informações fornecidas no modal do depurador são inestimáveis ​​para diagnosticar problemas comuns, tais como:
+
+Anúncios não exibidos : verifique a detecção de espaços reservados e o status dos anúncios para garantir que os espaços reservados estejam definidos e os anúncios atribuídos.
+
+Falha nas solicitações de anúncios : Se as solicitações de anúncios não estiverem sendo enviadas ou estiverem falhando, o depurador fornecerá mensagens de erro que apontam para possíveis configurações incorretas.
+
+Problemas com o carregamento do script : Se o script não for carregado corretamente, verifique se a tag do script está presente no seu código-fonte e configurada corretamente.
+
+Conclusão 🔗
+O Depurador de Integração JavaScript do EzoicAds é uma ferramenta simples, porém poderosa, que ajuda você a garantir que sua configuração de anúncios esteja funcionando conforme o esperado. Seguindo estes passos, você pode identificar e resolver rapidamente problemas comuns, garantindo que seus anúncios sejam exibidos corretamente e sem interrupções.

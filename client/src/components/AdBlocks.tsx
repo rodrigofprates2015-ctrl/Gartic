@@ -6,27 +6,58 @@ interface AdBlockProps {
 
 export function AdBlock({ placeholderId }: AdBlockProps) {
   useEffect(() => {
-    const win = window as any;
-    if (win.ezstandalone && win.ezstandalone.cmd) {
-      win.ezstandalone.cmd.push(function () {
-        win.ezstandalone.showAds(placeholderId);
-      });
-    }
+    // Retry loading with exponential backoff
+    let attempts = 0;
+    const maxAttempts = 5;
+
+    const tryShowAds = () => {
+      attempts++;
+      const win = window as any;
+      
+      if (win.ezstandalone?.cmd) {
+        console.log(`[AdBlock ${placeholderId}] Showing ads (attempt ${attempts})`);
+        try {
+          win.ezstandalone.cmd.push(function () {
+            console.log(`[AdBlock ${placeholderId}] Executing showAds`);
+            if (win.ezstandalone.showAds) {
+              win.ezstandalone.showAds(placeholderId);
+            } else {
+              console.warn(`[AdBlock ${placeholderId}] showAds not available`);
+            }
+          });
+        } catch (error) {
+          console.error(`[AdBlock ${placeholderId}] Error:`, error);
+          if (attempts < maxAttempts) {
+            setTimeout(tryShowAds, 1000 * attempts);
+          }
+        }
+      } else if (attempts < maxAttempts) {
+        console.log(`[AdBlock ${placeholderId}] ezstandalone not ready, retrying... (${attempts}/${maxAttempts})`);
+        setTimeout(tryShowAds, 500 * attempts);
+      } else {
+        console.warn(`[AdBlock ${placeholderId}] Max retries reached`);
+      }
+    };
+
+    tryShowAds();
   }, [placeholderId]);
 
   return (
     <div
       id={`ezoic-pub-ad-placeholder-${placeholderId}`}
-      className="w-full min-h-[120px] bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 rounded-lg p-6 flex items-center justify-center border-2 border-dashed border-gray-400 dark:border-gray-600"
+      className="w-full"
+      data-ad-placeholder={placeholderId}
       style={{ minHeight: '120px' }}
     >
-      <div className="text-center pointer-events-none">
-        <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-          📢 Espaço de Anúncio #{placeholderId}
-        </p>
-        <p className="text-xs text-gray-600 dark:text-gray-400 mt-2">
-          Anúncios aparecerão após deploy
-        </p>
+      <div className="w-full min-h-[120px] bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 rounded-lg p-6 flex items-center justify-center border-2 border-dashed border-gray-400 dark:border-gray-600">
+        <div className="text-center pointer-events-none">
+          <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+            📢 Espaço de Anúncio #{placeholderId}
+          </p>
+          <p className="text-xs text-gray-600 dark:text-gray-400 mt-2">
+            Carregando anúncios...
+          </p>
+        </div>
       </div>
     </div>
   );

@@ -15,11 +15,22 @@
     <script data-cfasync="false" src="https://cmp.gatekeeperconsent.com/min.js"></script>
     <script data-cfasync="false" src="https://the.gatekeeperconsent.com/cmp.min.js"></script>
     
-    <!-- Ezoic Integration Script -->
-    <script async src="//www.ezojs.com/ezoic/sa.min.js"></script>
+    <!-- Ezoic Integration Script - Initialize before loading -->
     <script>
       window.ezstandalone = window.ezstandalone || {};
-      ezstandalone.cmd = ezstandalone.cmd || [];
+      window.ezstandalone.cmd = window.ezstandalone.cmd || [];
+      console.log('[Ezoic] Initializing ezstandalone...');
+    </script>
+    
+    <!-- Ezoic Main Script -->
+    <script async src="https://www.ezojs.com/ezoic/sa.min.js"></script>
+    
+    <!-- Ezoic Data Attribute Setup -->
+    <script>
+      document.documentElement.setAttribute('data-ezoic-version', '1');
+      if (window.ezstandalone && window.ezstandalone.cmd) {
+        console.log('[Ezoic] ezstandalone.cmd available');
+      }
     </script>
     
     <!-- Google tag (gtag.js) -->

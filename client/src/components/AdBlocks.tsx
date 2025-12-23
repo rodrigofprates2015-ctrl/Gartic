@@ -2,22 +2,22 @@ import { useEffect } from "react";
 
 interface AdBlockProps {
   placeholderId: number;
-  className?: string;
 }
 
-export function AdBlock({ placeholderId, className = "" }: AdBlockProps) {
+export function AdBlock({ placeholderId }: AdBlockProps) {
   useEffect(() => {
-    // Inicializar script do Ezoic se disponível
+    // Chamar ezstandalone.showAds() após o componente montar
     const win = window as any;
-    if (win.ezoicSelfService) {
-      win.ezoicSelfService.display();
+    if (win.ezstandalone && win.ezstandalone.cmd) {
+      win.ezstandalone.cmd.push(function () {
+        win.ezstandalone.showAds(placeholderId);
+      });
     }
   }, [placeholderId]);
 
   return (
     <div
       id={`ezoic-pub-ad-placeholder-${placeholderId}`}
-      className={className}
     />
   );
 }
@@ -26,7 +26,7 @@ export function AdBlock({ placeholderId, className = "" }: AdBlockProps) {
 export function AdBlockTop() {
   return (
     <div className="w-full py-2">
-      <AdBlock placeholderId={101} className="w-full" />
+      <AdBlock placeholderId={101} />
     </div>
   );
 }
@@ -35,7 +35,7 @@ export function AdBlockTop() {
 export function AdBlockBottom() {
   return (
     <div className="w-full py-2">
-      <AdBlock placeholderId={103} className="w-full" />
+      <AdBlock placeholderId={103} />
     </div>
   );
 }
@@ -44,7 +44,7 @@ export function AdBlockBottom() {
 export function AdBlockSidebarMiddle() {
   return (
     <div className="w-full py-2">
-      <AdBlock placeholderId={105} className="w-full" />
+      <AdBlock placeholderId={105} />
     </div>
   );
 }
@@ -53,7 +53,7 @@ export function AdBlockSidebarMiddle() {
 export function AdBlockSidebarBottom() {
   return (
     <div className="w-full py-2">
-      <AdBlock placeholderId={106} className="w-full" />
+      <AdBlock placeholderId={106} />
     </div>
   );
 }
@@ -62,7 +62,7 @@ export function AdBlockSidebarBottom() {
 export function AdBlockSidebarFloating() {
   return (
     <div className="hidden lg:block fixed right-4 top-20 w-64 z-40">
-      <AdBlock placeholderId={107} className="w-full" />
+      <AdBlock placeholderId={107} />
     </div>
   );
 }
@@ -71,7 +71,7 @@ export function AdBlockSidebarFloating() {
 export function AdBlockInContent() {
   return (
     <div className="w-full py-4">
-      <AdBlock placeholderId={115} className="w-full" />
+      <AdBlock placeholderId={115} />
     </div>
   );
 }

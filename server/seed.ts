@@ -1,69 +1,68 @@
 import { storage } from "../server/storage";
-import { insertPostSchema } from "@shared/schema";
 
 const seedPosts = [
   {
     title: "O que é o Jogo do Impostor e por que ele faz tanto sucesso?",
     slug: "o-que-e-o-jogo-do-impostor",
-    category: "Conteúdo Pilar",
-    excerpt: "Descubra a psicologia por trás da desconfiança e por que essa dinâmica de dedução social conquistou milhões de jogadores.",
+    category: "Pilar",
+    excerpt: "Descubra a psicologia por trás da desconfiança e entenda por que esse jogo de dedução social conquistou milhões de pessoas.",
     featured: true,
     author: "Equipe TikJogos",
-    content: `Se você já participou de uma reunião de amigos onde a tensão se misturava com risadas nervosas, provavelmente estava jogando algo relacionado à dedução social. O Jogo do Impostor conquistou milhões de jogadores justamente por essa combinação única: ele une estratégia mental, observação afiada e muita interação social.
-
-Mas o que torna essa dinâmica tão viciante? A resposta curta é que ele transforma seus amigos em enigmas. A proposta é simples na teoria, mas na prática exige uma atenção constante aos detalhes e ao comportamento de quem está ao seu redor.
-
-### A psicologia por trás da desconfiança
-Diferente de jogos de tabuleiro tradicionais, onde a sorte nos dados define o vencedor, aqui o "tabuleiro" é a mente dos outros jogadores. Cada rodada cria um clima de desconfiança saudável. Você não está lutando contra o jogo; está lutando contra a capacidade de mentir (ou de dizer a verdade) dos seus companheiros.
-
-Qualquer atitude pode levantar suspeitas. Se alguém fica muito quieto, é suspeito. Se fala demais, é suspeito. Esse estado de alerta permanente é o que mantém todos os participantes envolvidos do início ao fim da partida. Ninguém fica esperando passivamente a sua vez de jogar; o jogo acontece em tempo real, na conversa e nos olhares.
-
-### Por que nenhuma partida é igual?
-A rejogabilidade é um dos pontos fortes desse gênero. Você pode jogar com o mesmo grupo de pessoas dez vezes seguidas, e as dez partidas serão completamente diferentes.
-
-Isso acontece porque o fator humano faz com que nenhuma partida seja igual à outra. Em uma rodada, seu amigo tímido pode ser um impostor agressivo; na outra, ele pode ser um inocente injustiçado. Essa variabilidade torna o jogo sempre interessante e imprevisível.
-
-### Como funciona a dinâmica básica
-Geralmente, o grupo recebe uma palavra secreta ou um tema, exceto uma pessoa: o impostor. O objetivo dele é se misturar e fingir que sabe do que todos estão falando. Já o objetivo do grupo é identificar quem é o intruso antes que seja tarde demais.
-
-O ciclo do jogo envolve:
-1. **Recebimento de informações:** Todos leem suas dicas, menos o impostor.
-2. **Rodada de discussão:** Perguntas e respostas vagas para testar o conhecimento alheio.
-3. **Votação:** O momento da verdade onde as alianças se rompem.
-
-### O segredo do sucesso viral
-Nos últimos anos, vimos uma explosão desses jogos (como Among Us ou Spyfall). O motivo é a conexão. Em um mundo cada vez mais digital, o Jogo do Impostor força a interação humana direta, a leitura de linguagem corporal e o debate. É uma experiência social completa.
-
-No fim das contas, ganhar ou perder é detalhe. O que faz sucesso mesmo é a história que o grupo cria junto: aquela mentira descarada que colou ou a acusação perfeita que desmascarou o vilão no último segundo.`
+    content: `
+      <h2 class="text-2xl font-bold text-white mb-4">A psicologia por trás da desconfiança</h2>
+      <p class="mb-4">Se você já participou de uma reunião de amigos onde a tensão se misturava com risadas nervosas, provavelmente estava jogando algo relacionado à dedução social. O Jogo do Impostor conquistou milhões de jogadores justamente por essa combinação única: ele une estratégia mental, observação afiada e muita interação social.</p>
+      <p class="mb-4">Diferente de jogos de tabuleiro tradicionais, onde a sorte nos dados define o vencedor, aqui o "tabuleiro" é a mente dos outros jogadores. Cada rodada cria um clima de desconfiança saudável. Você não está lutando contra o jogo; está lutando contra a capacidade de mentir (ou de dizer a verdade) dos seus companheiros.</p>
+      
+      <h2 class="text-2xl font-bold text-white mb-4 mt-8">Por que nenhuma partida é igual?</h2>
+      <p class="mb-4">A rejogabilidade é um dos pontos fortes desse gênero. Você pode jogar com o mesmo grupo de pessoas dez vezes seguidas, e as dez partidas serão completamente diferentes. Isso acontece porque o fator humano faz com que nenhuma partida seja igual à outra.</p>
+      
+      <h2 class="text-2xl font-bold text-white mb-4 mt-8">Como funciona a dinâmica básica</h2>
+      <ul class="list-disc pl-5 mb-4 space-y-2 text-slate-300">
+          <li><strong>Recebimento de informações:</strong> Todos leem suas dicas, menos o impostor.</li>
+          <li><strong>Rodada de discussão:</strong> Perguntas e respostas vagas para testar o conhecimento alheio.</li>
+          <li><strong>Votação:</strong> O momento da verdade onde as alianças se rompem.</li>
+      </ul>
+      <p class="mb-4">No fim das contas, ganhar ou perder é detalhe. O que faz sucesso mesmo é a história que o grupo cria junto: aquela mentira descarada que colou ou a acusação perfeita que desmascarou o vilão no último segundo.</p>
+    `
   },
   {
     title: "Como usar o TikJogos para partidas mais organizadas",
     slug: "como-usar-o-tikjogos",
-    category: "Tutorial",
-    excerpt: "Elimine a bagunça de sorteios manuais e cronometros com a plataforma TikJogos.",
+    category: "Dica",
+    excerpt: "Chega de bagunça com papel e caneta. Veja como a tecnologia pode eliminar a burocracia e focar na estratégia.",
     featured: false,
     author: "Equipe TikJogos",
-    content: `Quem joga o Jogo do Impostor "analogicamente" (usando papel e caneta ou apenas a conversa) sabe que a bagunça é quase inevitável. Sorteios manuais demoram, alguém sempre vê o papel do outro sem querer, e cronometrar as rodadas vira uma tarefa chata.
-
-Foi para resolver esses atritos que o TikJogos surgiu. A plataforma funciona como uma solução prática para organizar partidas do Jogo do Impostor, eliminando a burocracia para que vocês possam ir direto ao que interessa.
-
-### Centralizando a bagunça
-O principal problema de grupos grandes é o fluxo de informação. "De quem é a vez?", "Quanto tempo falta?", "Quem já votou?". O TikJogos centraliza essas informações e ajuda a manter o controle do andamento do jogo.
-
-Ao usar a ferramenta como "juiz" e organizador, você tira o peso das costas dos participantes. Ninguém precisa ficar de fora para moderar a partida; o sistema faz isso por vocês.
-
-### Adeus às falhas técnicas
-Não há nada pior do que uma partida arruinada porque alguém esqueceu de contar o tempo ou se confundiu na ordem de fala. Com a ferramenta digital, os jogadores evitam confusões comuns, como falhas na contagem de tempo ou na definição de turnos.
-
-**Vantagens de digitalizar a partida:**
-- **Sorteio imparcial:** O algoritmo define o impostor, garantindo aleatoriedade real.
-- **Sigilo:** Cada um vê sua palavra/função na própria tela, sem risco de "espiar".
-- **Timer automático:** A pressão do tempo é real e igual para todos.
-
-### Foco total na estratégia
-Quando a logística deixa de ser um problema, a qualidade do jogo sobe. A automação permite que o grupo foque no mais importante: a estratégia, a comunicação e a diversão durante a partida.
-
-Em vez de discutir regras ou quem é o próximo, vocês gastam saliva defendendo sua inocência ou montando armadilhas lógicas para pegar o mentiroso. O TikJogos atua nos bastidores para que a "guerra social" brilhe no palco principal.`
+    content: `
+      <p class="mb-4">Quem joga o Jogo do Impostor "analogicamente" sabe que a bagunça é quase inevitável. O TikJogos surgiu para resolver esses atritos, funcionando como um juiz digital.</p>
+      
+      <h3 class="text-xl font-semibold text-indigo-300 mb-2">Centralizando a bagunça</h3>
+      <p class="mb-4">O principal problema de grupos grandes é o fluxo de informação. "De quem é a vez?", "Quanto tempo falta?". O TikJogos centraliza essas informações e ajuda a manter o controle do andamento do jogo.</p>
+      
+      <h3 class="text-xl font-semibold text-indigo-300 mb-2">Vantagens de digitalizar a partida</h3>
+      <ul class="list-disc pl-5 mb-4 space-y-2 text-slate-300">
+          <li><strong>Sorteio imparcial:</strong> O algoritmo define o impostor, garantindo aleatoriedade real.</li>
+          <li><strong>Sigilo:</strong> Cada um vê sua palavra/função na própria tela.</li>
+          <li><strong>Timer automático:</strong> A pressão do tempo é real e igual para todos.</li>
+      </ul>
+      <p class="mb-4">Experimente rodar a próxima partida com o auxílio do site e perceba como o ritmo fica mais dinâmico.</p>
+    `
+  },
+  {
+    title: "Estratégias básicas para quem joga como impostor",
+    slug: "estrategias-impostor",
+    category: "Estratégia",
+    excerpt: "Tirou a carta do Impostor? Não entre em pânico. Aprenda a mentir com coerência e usar os outros a seu favor.",
+    featured: false,
+    author: "Equipe TikJogos",
+    content: `
+      <p class="mb-4">Ser impostor exige mais do que simplesmente mentir. É fundamental manter um comportamento coerente durante toda a partida.</p>
+      
+      <h3 class="text-xl font-semibold text-indigo-300 mb-2">A Regra de Ouro: Coerência</h3>
+      <p class="mb-4">O maior erro dos novatos é tentar ser criativo demais. Se você costuma falar pouco quando é inocente, não comece a falar pelos cotovelos agora. Tente replicar seu "estado natural" de jogo.</p>
+      
+      <h3 class="text-xl font-semibold text-indigo-300 mb-2">Use os outros a seu favor</h3>
+      <p class="mb-4">Deixe que os inocentes falem primeiro. Muitas vezes, um inocente confuso dá uma dica que você pode "roubar" e usar como se fosse sua. Jogar de impostor é a arte de se esconder à vista de todos.</p>
+    `
   }
 ];
 
@@ -74,6 +73,10 @@ async function seed() {
     if (!existing) {
       await storage.createPost(postData);
       console.log(`Created post: ${postData.title}`);
+    } else {
+      // Update existing posts to match the new structure/content if needed
+      // For simplicity, we just log they exist
+      console.log(`Post already exists: ${postData.slug}`);
     }
   }
   console.log("Seeding complete!");

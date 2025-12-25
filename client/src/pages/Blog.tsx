@@ -1,14 +1,21 @@
-import { useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
-import { ArrowLeft, Calendar, User } from "lucide-react";
+import { Post } from "@shared/schema";
+import { useEffect } from "react";
+import { ArrowLeft, Calendar, User, Search, Ghost } from "lucide-react";
 import backgroundImg from "@assets/background_natal_1765071997985.png";
 import logoTikjogos from "@assets/logo tikjogos_1764616571363.png";
 import { AdBlockTop, AdBlockInContent, AdBlockBottom } from "@/components/AdBlocks";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Input } from "@/components/ui/input";
 
 export default function Blog() {
+  const { data: posts, isLoading } = useQuery<Post[]>({
+    queryKey: ["/api/posts"],
+  });
+
   useEffect(() => {
     document.title = "Blog - TikJogos Impostor | Estratégias e Dicas";
-    
     const metaDescription = document.querySelector('meta[name="description"]');
     if (metaDescription) {
       metaDescription.setAttribute("content", "Leia artigos, estratégias e dicas sobre o TikJogos Impostor. Aprenda técnicas avançadas para melhorar seu desempenho no jogo de dedução social!");
@@ -17,7 +24,7 @@ export default function Blog() {
 
   return (
     <div 
-      className="min-h-screen w-full relative"
+      className="min-h-screen w-full relative flex flex-col"
       style={{
         backgroundImage: `url(${backgroundImg})`,
         backgroundSize: 'cover',
@@ -26,171 +33,102 @@ export default function Blog() {
         backgroundAttachment: 'fixed'
       }}
     >
-      {/* Top Ad Block */}
       <AdBlockTop />
 
-      {/* Header */}
-      <header className="sticky top-0 z-50 bg-[#0a1628]/90 backdrop-blur-sm border-b border-[#3d4a5c]">
-        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
-          <Link href="/" className="flex items-center gap-2 text-[#4a90a4] hover:text-[#5aa0b4] transition-colors" data-testid="link-back-home">
-            <ArrowLeft className="w-5 h-5" />
-            <span className="font-medium">Voltar</span>
+      {/* Navbar similar to existing layout */}
+      <nav className="bg-[#0a1628]/90 backdrop-blur-sm border-b border-[#3d4a5c] sticky top-0 z-50">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+          <Link href="/" className="flex items-center cursor-pointer">
+            <img src={logoTikjogos} alt="TikJogos" className="h-8" />
           </Link>
-          <img src={logoTikjogos} alt="TikJogos" className="h-8" />
+          <div className="hidden md:flex items-center space-x-6">
+            <Link href="/" className="text-gray-300 hover:text-white transition-colors text-sm font-medium">Início</Link>
+            <Link href="/comojogar" className="text-gray-300 hover:text-white transition-colors text-sm font-medium">Como Jogar</Link>
+            <Link href="/" className="btn-orange px-4 py-2 text-sm">Jogar Agora</Link>
+          </div>
         </div>
-      </header>
+      </nav>
 
-      {/* Main Content */}
-      <main className="max-w-4xl mx-auto px-4 py-8">
-        {/* Blog Hero */}
-        <section className="text-center mb-12">
-          <h1 className="text-3xl md:text-4xl font-bold text-white mb-4" data-testid="heading-main">
-            Blog TikJogos Impostor
+      <main className="flex-grow w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <section className="text-center mb-16 fade-in">
+          <h1 className="text-4xl md:text-5xl font-black text-white mb-4 tracking-tight">
+            TikJogos<span className="text-[#4a90a4]">Blog</span>
           </h1>
-          <p className="text-gray-300 text-lg">
-            Estratégias, dicas e histórias da comunidade de jogadores
+          <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+            Domine a arte da dedução social com nossas estratégias e dicas exclusivas.
           </p>
         </section>
 
-        {/* Blog Post */}
-        <article className="bg-[#16213e]/80 border border-[#3d4a5c] rounded-lg overflow-hidden mb-8">
-          {/* Featured Image */}
-          <div 
-            className="w-full h-80 object-cover bg-gradient-to-r from-[#4a90a4] to-[#e8a045] flex items-center justify-center"
-            data-testid="img-blog-featured"
-          >
-            <h3 className="text-white text-2xl font-bold text-center px-4">
-              Estratégias Avançadas para Vencer no TikJogos Impostor
-            </h3>
+        {isLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="bg-[#16213e]/80 border border-[#3d4a5c] rounded-lg overflow-hidden h-full">
+                <Skeleton className="h-48 w-full" />
+                <div className="p-6 space-y-4">
+                  <Skeleton className="h-6 w-3/4" />
+                  <Skeleton className="h-20 w-full" />
+                </div>
+              </div>
+            ))}
           </div>
-          
-          {/* Post Content */}
-          <div className="p-8">
-            {/* Meta Information */}
-            <div className="flex flex-wrap gap-6 mb-6 text-gray-400 text-sm">
-              <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4" />
-                <span data-testid="text-publish-date">21 de Dezembro de 2024</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <User className="w-4 h-4" />
-                <span data-testid="text-author">Rodrigo Freitas</span>
-              </div>
-            </div>
-
-            {/* Title */}
-            <h2 className="text-2xl md:text-3xl font-bold text-white mb-4" data-testid="heading-post-title">
-              5 Estratégias Avançadas para Vencer no TikJogos Impostor
-            </h2>
-
-            {/* Content */}
-            <div className="prose prose-invert max-w-none text-gray-300 space-y-6">
-              <p>
-                O TikJogos Impostor é mais do que apenas um jogo de sorte — é um jogo de estratégia, 
-                leitura de comportamento e comunicação. Neste artigo, vamos compartilhar 5 estratégias 
-                avançadas que podem transformar sua forma de jogar e aumentar significativamente suas 
-                chances de vitória.
-              </p>
-
-              <div>
-                <h3 className="text-xl font-bold text-[#4a90a4] mb-3">1. Domine a Leitura de Dicas</h3>
-                <p>
-                  A chave para identificar o impostor está em analisar cuidadosamente as dicas que 
-                  são dadas. No modo "Palavra Secreta", observe não apenas o que é dito, mas também 
-                  como é dito. Uma dica muito genérica ou muito específica pode ser um sinal de que 
-                  o impostor está tentando se disfarçar. Preste atenção aos detalhes e padrões.
-                </p>
-              </div>
-
-              <div>
-                <h3 className="text-xl font-bold text-[#4a90a4] mb-3">2. Use a Tática do Silêncio Estratégico</h3>
-                <p>
-                  Nem sempre você precisa falar muito. Às vezes, ficar quieto e observar pode ser 
-                  mais produtivo. Se você é um tripulante com conhecimento, deixe que os outros falem 
-                  primeiro. Isso ajuda você a entender quem está fazendo sentido e quem está apenas 
-                  fingindo conhecimento. Se você é o impostor, um silêncio estratégico pode evitar 
-                  que você diga algo que revele sua identidade.
-                </p>
-              </div>
-
-              <div>
-                <h3 className="text-xl font-bold text-[#4a90a4] mb-3">3. Crie Conexões Verdadeiras com Outros Jogadores</h3>
-                <p>
-                  Observe quem parece estar "sincronizado" com você nas respostas. Se dois jogadores 
-                  estão consistentemente alinhados em suas dicas e interpretações, é provável que 
-                  estejam juntos no jogo. O impostor terá dificuldade em manter essa sincronização 
-                  porque não tem a mesma informação que os tripulantes.
-                </p>
-              </div>
-
-              <div>
-                <h3 className="text-xl font-bold text-[#4a90a4] mb-3">4. Controle Seus Comportamentos Contos</h3>
-                <p>
-                  Se você é o impostor, evite padrões óbvios. Não fale sempre na mesma ordem ou 
-                  sempre com a mesma extensão de dicas. Se você é um tripulante, observe padrões 
-                  comportamentais consistentes que possam indicar a falta de conhecimento genuíno.
-                </p>
-              </div>
-
-              <div>
-                <h3 className="text-xl font-bold text-[#4a90a4] mb-3">5. Gerencie Suas Emoções e Comunique-se Efetivamente</h3>
-                <p>
-                  Por fim, lembre-se de que a comunicação é fundamental. Seja respeitoso, divirta-se 
-                  e não leve o jogo para o lado pessoal. Os melhores jogadores são aqueles que conseguem 
-                  manter a compostura, analisar informações objetivamente e se comunicar de forma clara 
-                  e convincente. A confiança genuína é construída através de consistência nas suas 
-                  respostas e comportamento durante o jogo.
-                </p>
-              </div>
-
-              <p className="text-base">
-                <strong>Conclusão:</strong> O TikJogos Impostor recompensa aqueles que conseguem equilibrar 
-                observação cuidadosa, estratégia inteligente e comunicação efetiva. Pratique essas estratégias, 
-                adapte-as ao seu estilo de jogo e veja como suas vitórias aumentam!
-              </p>
-            </div>
-
-            {/* CTA */}
-            <div className="mt-10 pt-6 border-t border-[#3d4a5c]">
-              <Link 
-                href="/" 
-                className="btn-orange inline-flex items-center gap-2 px-6 py-2"
-                data-testid="button-play-now"
-              >
-                Jogar Agora
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {posts?.map((post) => (
+              <Link key={post.id} href={`/blog/${post.slug}`} className="group">
+                <article className="bg-[#16213e]/80 border border-[#3d4a5c] rounded-lg overflow-hidden h-full flex flex-col transition-all hover:border-[#4a90a4]/50 hover:translate-y-[-4px]">
+                  <div className="relative h-48 bg-gradient-to-br from-[#1e293b] to-[#0f172a] flex items-center justify-center p-6 text-center">
+                    <Ghost className="absolute top-4 right-4 text-white/5 w-24 h-24 -rotate-12" />
+                    <h3 className="text-white text-xl font-bold leading-tight z-10">
+                      {post.title}
+                    </h3>
+                    <div className="absolute top-4 left-4">
+                      <span className="bg-[#4a90a4] text-white text-[10px] font-bold uppercase px-2 py-0.5 rounded">
+                        {post.category}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="p-6 flex-grow flex flex-col">
+                    <div className="flex items-center gap-4 text-xs text-gray-400 mb-4 font-medium">
+                      <div className="flex items-center gap-1.5">
+                        <Calendar className="w-3.5 h-3.5" />
+                        <span>{new Date(post.createdAt).toLocaleDateString('pt-BR')}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <User className="w-3.5 h-3.5" />
+                        <span>{post.author}</span>
+                      </div>
+                    </div>
+                    <p className="text-gray-400 text-sm leading-relaxed mb-6 line-clamp-3">
+                      {post.excerpt}
+                    </p>
+                    <div className="mt-auto text-[#4a90a4] font-bold text-sm flex items-center gap-2 group-hover:text-[#5aa0b4] transition-colors">
+                      Ler artigo completo 
+                      <span className="transition-transform group-hover:translate-x-1">→</span>
+                    </div>
+                  </div>
+                </article>
               </Link>
-            </div>
+            ))}
           </div>
-        </article>
+        )}
 
-        {/* Ad Block In Content */}
         <AdBlockInContent />
-
-        {/* Additional Articles Hint */}
-        <section className="text-center py-8">
-          <p className="text-gray-400">
-            Mais artigos em breve... Acompanhe nosso blog para novas estratégias e dicas!
-          </p>
-        </section>
       </main>
 
-      {/* Bottom Ad Block */}
       <AdBlockBottom />
 
-      {/* Footer */}
-      <footer className="bg-[#0a1628]/90 border-t border-[#3d4a5c] py-6">
-        <div className="max-w-4xl mx-auto px-4 text-center text-gray-500 text-sm">
-          <p>TikJogos Impostor - Jogo de Dedução Social Online</p>
-          <p className="mt-2">
-            <Link href="/blog" className="hover:text-gray-300 transition-colors">Blog</Link>
-            {" | "}
-            <Link href="/privacidade" className="hover:text-gray-300 transition-colors">Privacidade</Link>
-            {" | "}
-            <Link href="/termos" className="hover:text-gray-300 transition-colors">Termos</Link>
-          </p>
-          <p className="mt-3 text-xs text-gray-600 max-w-2xl mx-auto">
-            O TikJogos é um projeto independente de fãs. Todas as marcas registradas (como nomes de personagens e franquias) pertencem aos seus respectivos proprietários e são usadas aqui apenas para fins de referência em contexto de jogo de palavras/trivia.
-          </p>
+      <footer className="bg-[#0a1628]/90 border-t border-[#3d4a5c] py-12">
+        <div className="max-w-6xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-8">
+          <div className="text-center md:text-left">
+            <p className="text-gray-500 text-sm">© 2024 TikJogos. Todos os direitos reservados.</p>
+            <div className="flex gap-4 mt-4 justify-center md:justify-start">
+              <Link href="/privacidade" className="text-gray-600 hover:text-gray-400 text-xs transition-colors">Privacidade</Link>
+              <Link href="/termos" className="text-gray-600 hover:text-gray-400 text-xs transition-colors">Termos</Link>
+            </div>
+          </div>
+          <div className="flex gap-6">
+            <a href="#" className="text-gray-500 hover:text-[#4a90a4] transition-colors"><Search className="w-5 h-5" /></a>
+          </div>
         </div>
       </footer>
     </div>

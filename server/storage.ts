@@ -234,26 +234,6 @@ export class MemoryStorage implements IStorage {
   async deleteTheme(id: string): Promise<void> {
     this.themesMap.delete(id);
   }
-
-  async getPosts(): Promise<Post[]> {
-    return Array.from(this.postsMap.values()).sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
-  }
-
-  async getPostBySlug(slug: string): Promise<Post | undefined> {
-    return Array.from(this.postsMap.values()).find(p => p.slug === slug);
-  }
-
-  async createPost(postData: InsertPost): Promise<Post> {
-    const id = `mem-post-${this.postIdCounter++}`;
-    const post: Post = {
-      id,
-      ...postData,
-      imageUrl: postData.imageUrl ?? null,
-      createdAt: new Date(),
-    };
-    this.postsMap.set(id, post);
-    return post;
-  }
 }
 
 export class DatabaseStorage implements IStorage {

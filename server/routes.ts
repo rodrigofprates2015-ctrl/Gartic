@@ -375,14 +375,15 @@ const PALAVRA_SECRETA_SUBMODES_DATA: Record<string, string[]> = {
   strangerThings: ['Eleven', 'Mike', 'Lucas', 'Dustin', 'Will', 'Max', 'Hopper', 'Joyce', 'Vecna', 'Demogorgon', 'Mind Flayer', 'Hawkins', 'Upside Down', 'Barb', 'Robin', 'Steve', 'Billy', 'Eddie', 'Murray', 'Kali', 'Brenner', 'Suzie', 'Erica', 'Laboratório', 'Neva', 'Walkie-talkie', 'Arcade', 'Starcourt', 'Hellfire', 'Byers']
 };
 
-function setupGameMode(mode: GameModeType, players: Player[], impostorId: string, selectedSubmode?: string, roomCode?: string, customWords?: string[]): GameData {
+function setupGameMode(mode: GameModeType, players: Player[], impostorId: string, selectedSubmode?: string, roomCode?: string, customWords?: string[], themeCode?: string): GameData {
   const code = roomCode || 'default';
   
   switch (mode) {
     case "palavraSecreta": {
       // If custom words provided (from user-created theme), use them
       if (customWords && customWords.length > 0) {
-        const poolKey = `custom-${code}`;
+        // Use themeCode in poolKey to ensure different themes have separate pools
+        const poolKey = themeCode ? `custom-${themeCode}-${code}` : `custom-${code}`;
         const word = getFromPool(poolKey, customWords, wordPools, code);
         return { word };
       }
@@ -444,7 +445,8 @@ function setupGameMode(mode: GameModeType, players: Player[], impostorId: string
     case "palavraComunidade": {
       // Community themes - must have custom words provided
       if (customWords && customWords.length > 0) {
-        const poolKey = `comunidade-${code}`;
+        // Use themeCode in poolKey to ensure different themes have separate pools
+        const poolKey = themeCode ? `comunidade-${themeCode}-${code}` : `comunidade-${code}`;
         const word = getFromPool(poolKey, customWords, wordPools, code);
         return { word };
       }
@@ -1230,7 +1232,7 @@ export async function registerRoutes(
       const impostorIndex = Math.floor(Math.random() * connectedPlayers.length);
       const impostorId = connectedPlayers[impostorIndex].uid;
       
-      const gameData = setupGameMode(gameMode, connectedPlayers, impostorId, selectedSubmode, code.toUpperCase(), customWords);
+      const gameData = setupGameMode(gameMode, connectedPlayers, impostorId, selectedSubmode, code.toUpperCase(), customWords, themeCode);
       
       const modeInfo = GAME_MODES[gameMode];
 

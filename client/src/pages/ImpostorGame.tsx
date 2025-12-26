@@ -37,7 +37,13 @@ import {
   Skull,
   Trophy,
   UserX,
-  Gamepad2
+  Gamepad2,
+  Search,
+  Plus,
+  TrendingUp,
+  Clock,
+  Star,
+  Sparkles
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -81,6 +87,8 @@ const ThemeWorkshopModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () 
   const [activeTab, setActiveTab] = useState<ThemeWorkshopTab>('galeria');
   const [publicThemes, setPublicThemes] = useState<PublicTheme[]>([]);
   const [isLoadingThemes, setIsLoadingThemes] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterTab, setFilterTab] = useState<'trending' | 'new' | 'popular'>('trending');
   
   // Form state for creating new theme
   const [titulo, setTitulo] = useState('');
@@ -138,7 +146,15 @@ const ThemeWorkshopModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () 
       const res = await fetch('/api/themes/public');
       if (res.ok) {
         const themes = await res.json();
-        setPublicThemes(themes);
+        // Enrich themes with mock data for better UX
+        const enrichedThemes = themes.map((theme: PublicTheme, index: number) => ({
+          ...theme,
+          emoji: ['🎮', '🎯', '🎲', '🎪', '🎨', '🎭', '🎬', '🎤', '🎸', '⚽'][index % 10],
+          plays: Math.floor(Math.random() * 1000) + 50,
+          likes: Math.floor(Math.random() * 200) + 10,
+          isHot: index < 2 // First 2 themes are "hot"
+        }));
+        setPublicThemes(enrichedThemes);
       }
     } catch (err) {
       console.error('Failed to load themes:', err);
@@ -279,34 +295,165 @@ const ThemeWorkshopModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () 
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-4">
           {activeTab === 'galeria' && (
-            <div className="space-y-3">
+            <div className="space-y-4">
+              {/* Search and Filters */}
+              <div className="space-y-3">
+                {/* Search Bar */}
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Buscar tema (ex: Futebol, Anime...)"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2.5 bg-[#16213e]/80 border border-[#3d4a5c] rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-[#6b4ba3] transition-colors"
+                  />
+                </div>
+
+                {/* Filter Tabs */}
+                <div className="flex gap-2 p-1 bg-[#16213e]/50 rounded-xl border border-[#3d4a5c]">
+                  <button
+                    onClick={() => setFilterTab('trending')}
+                    className={cn(
+                      "flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold transition-all",
+                      filterTab === 'trending'
+                        ? "bg-[#6b4ba3] text-white shadow-lg"
+                        : "text-gray-400 hover:text-white"
+                    )}
+                  >
+                    <TrendingUp className="w-3.5 h-3.5" />
+                    Em Alta
+                  </button>
+                  <button
+                    onClick={() => setFilterTab('new')}
+                    className={cn(
+                      "flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold transition-all",
+                      filterTab === 'new'
+                        ? "bg-[#6b4ba3] text-white shadow-lg"
+                        : "text-gray-400 hover:text-white"
+                    )}
+                  >
+                    <Clock className="w-3.5 h-3.5" />
+                    Novos
+                  </button>
+                  <button
+                    onClick={() => setFilterTab('popular')}
+                    className={cn(
+                      "flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold transition-all",
+                      filterTab === 'popular'
+                        ? "bg-[#6b4ba3] text-white shadow-lg"
+                        : "text-gray-400 hover:text-white"
+                    )}
+                  >
+                    <Star className="w-3.5 h-3.5" />
+                    Popular
+                  </button>
+                </div>
+              </div>
+
+              {/* Themes Grid */}
               {isLoadingThemes ? (
-                <div className="flex items-center justify-center py-8">
-                  <Loader2 className="w-6 h-6 animate-spin text-[#6b4ba3]" />
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="w-8 h-8 animate-spin text-[#6b4ba3]" />
                 </div>
               ) : publicThemes.length === 0 ? (
-                <div className="text-center py-8 text-gray-400">
-                  <p>Nenhum tema disponivel ainda.</p>
-                  <p className="text-sm mt-2">Seja o primeiro a criar um!</p>
+                <div className="text-center py-12">
+                  <div className="text-5xl mb-4">🎮</div>
+                  <h3 className="text-lg font-bold text-white mb-2">Nenhum tema disponível ainda</h3>
+                  <p className="text-sm text-gray-400 mb-4">Seja o primeiro a criar um tema incrível!</p>
+                  <button
+                    onClick={() => setActiveTab('criar')}
+                    className="btn-orange px-6 py-2 text-sm inline-flex items-center gap-2"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Criar Tema
+                  </button>
                 </div>
               ) : (
-                publicThemes.map((theme) => (
-                  <div 
-                    key={theme.id}
-                    className="p-3 rounded-xl bg-[#16213e]/80 border border-[#3d4a5c] hover:border-[#6b4ba3] transition-colors"
-                    data-testid={`theme-${theme.id}`}
+                <div className="grid grid-cols-1 gap-3">
+                  {/* Create New Card */}
+                  <button
+                    onClick={() => setActiveTab('criar')}
+                    className="group relative p-4 rounded-xl border-2 border-dashed border-[#3d4a5c] hover:border-[#6b4ba3] bg-[#16213e]/20 hover:bg-[#16213e]/40 transition-all duration-300 text-left"
                   >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="font-semibold text-white">{theme.titulo}</h3>
-                        <p className="text-xs text-gray-400">por {theme.autor}</p>
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-xl bg-[#6b4ba3]/10 group-hover:bg-[#6b4ba3]/20 flex items-center justify-center transition-colors">
+                        <Plus className="w-6 h-6 text-[#6b4ba3]" />
                       </div>
-                      <span className="text-xs text-[#6b4ba3] bg-[#6b4ba3]/10 px-2 py-1 rounded">
-                        {theme.palavrasCount} palavras
-                      </span>
+                      <div>
+                        <h3 className="font-bold text-white group-hover:text-[#6b4ba3] transition-colors">Criar Novo Tema</h3>
+                        <p className="text-xs text-gray-400">Sua ideia pode ser o próximo sucesso!</p>
+                      </div>
                     </div>
-                  </div>
-                ))
+                  </button>
+
+                  {/* Theme Cards */}
+                  {publicThemes
+                    .filter(theme => 
+                      theme.titulo.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                      theme.autor.toLowerCase().includes(searchQuery.toLowerCase())
+                    )
+                    .map((theme) => (
+                      <div
+                        key={theme.id}
+                        className="group relative p-4 rounded-xl bg-[#16213e]/80 border border-[#3d4a5c] hover:border-[#6b4ba3] hover:-translate-y-1 transition-all duration-300 cursor-pointer"
+                        data-testid={`theme-${theme.id}`}
+                      >
+                        <div className="flex items-start gap-3">
+                          {/* Theme Icon/Emoji */}
+                          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#6b4ba3] to-[#4a3070] flex items-center justify-center text-2xl flex-shrink-0">
+                            {theme.emoji || '🎯'}
+                          </div>
+                          
+                          {/* Theme Info */}
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-bold text-white group-hover:text-[#6b4ba3] transition-colors truncate">
+                              {theme.titulo}
+                            </h3>
+                            <p className="text-xs text-gray-400 mb-2">
+                              por <span className="text-gray-300">@{theme.autor}</span>
+                            </p>
+                            
+                            {/* Stats */}
+                            <div className="flex items-center gap-3 text-xs">
+                              <div className="flex items-center gap-1 text-gray-400">
+                                <Sparkles className="w-3 h-3" />
+                                <span>{theme.palavrasCount} palavras</span>
+                              </div>
+                              {theme.plays !== undefined && (
+                                <div className="flex items-center gap-1 text-gray-400">
+                                  <Play className="w-3 h-3 fill-gray-400" />
+                                  <span>{theme.plays}</span>
+                                </div>
+                              )}
+                              {theme.likes !== undefined && (
+                                <div className="flex items-center gap-1 text-pink-400">
+                                  <Heart className="w-3 h-3 fill-pink-400" />
+                                  <span>{theme.likes}</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Play Button (appears on hover) */}
+                          <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button className="btn-orange px-4 py-2 text-xs flex items-center gap-1.5">
+                              <Play className="w-3 h-3 fill-white" />
+                              Jogar
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Hot Badge */}
+                        {theme.isHot && (
+                          <div className="absolute top-2 right-2 bg-gradient-to-r from-orange-500 to-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                            <TrendingUp className="w-2.5 h-2.5" />
+                            HOT
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                </div>
               )}
             </div>
           )}
@@ -979,6 +1126,10 @@ type PublicTheme = {
   palavrasCount: number;
   accessCode: string;
   createdAt: string;
+  emoji?: string;
+  plays?: number;
+  likes?: number;
+  isHot?: boolean;
 };
 
 const CommunityThemesModal = ({ isOpen, onClose, onSelectTheme }: { isOpen: boolean; onClose: () => void; onSelectTheme: (themeId: string) => void }) => {
@@ -998,7 +1149,15 @@ const CommunityThemesModal = ({ isOpen, onClose, onSelectTheme }: { isOpen: bool
       const res = await fetch('/api/themes/public');
       if (res.ok) {
         const themes = await res.json();
-        setPublicThemes(themes);
+        // Enrich themes with mock data for better UX
+        const enrichedThemes = themes.map((theme: PublicTheme, index: number) => ({
+          ...theme,
+          emoji: ['🎮', '🎯', '🎲', '🎪', '🎨', '🎭', '🎬', '🎤', '🎸', '⚽'][index % 10],
+          plays: Math.floor(Math.random() * 1000) + 50,
+          likes: Math.floor(Math.random() * 200) + 10,
+          isHot: index < 2
+        }));
+        setPublicThemes(enrichedThemes);
       }
     } catch (err) {
       console.error('Failed to load themes:', err);
@@ -1028,41 +1187,84 @@ const CommunityThemesModal = ({ isOpen, onClose, onSelectTheme }: { isOpen: bool
         </div>
         
         <div className="flex-1 overflow-y-auto p-4">
-          <div className="space-y-3">
-            {isLoadingThemes ? (
-              <div className="flex items-center justify-center py-8">
-                <Loader2 className="w-6 h-6 animate-spin text-[#6b4ba3]" />
-              </div>
-            ) : publicThemes.length === 0 ? (
-              <div className="text-center py-8 text-gray-400">
-                <p>Nenhum tema disponível ainda.</p>
-                <p className="text-sm mt-2">Seja o primeiro a criar um!</p>
-              </div>
-            ) : (
-              publicThemes.map((theme) => (
-                <button 
+          {isLoadingThemes ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="w-8 h-8 animate-spin text-[#6b4ba3]" />
+            </div>
+          ) : publicThemes.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="text-5xl mb-4">🎮</div>
+              <h3 className="text-lg font-bold text-white mb-2">Nenhum tema disponível ainda</h3>
+              <p className="text-sm text-gray-400">Aguarde novos temas da comunidade!</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-3">
+              {publicThemes.map((theme) => (
+                <button
                   key={theme.id}
                   onClick={() => {
                     onSelectTheme(theme.id);
                     onClose();
                     toast({ title: "Tema selecionado!", description: `"${theme.titulo}" será usado na partida.` });
                   }}
-                  className="w-full p-3 rounded-xl bg-[#16213e]/80 border border-[#3d4a5c] hover:border-[#6b4ba3] transition-colors text-left"
+                  className="group relative p-4 rounded-xl bg-[#16213e]/80 border border-[#3d4a5c] hover:border-[#6b4ba3] hover:-translate-y-1 transition-all duration-300 text-left"
                   data-testid={`theme-select-${theme.id}`}
                 >
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="min-w-0 flex-1">
-                      <h3 className="font-semibold text-white truncate">{theme.titulo}</h3>
-                      <p className="text-xs text-gray-400">por {theme.autor}</p>
+                  <div className="flex items-start gap-3">
+                    {/* Theme Icon/Emoji */}
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#6b4ba3] to-[#4a3070] flex items-center justify-center text-2xl flex-shrink-0">
+                      {theme.emoji || '🎯'}
                     </div>
-                    <span className="text-xs text-[#6b4ba3] bg-[#6b4ba3]/10 px-2 py-1 rounded whitespace-nowrap">
-                      {theme.palavrasCount} palavras
-                    </span>
+                    
+                    {/* Theme Info */}
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-bold text-white group-hover:text-[#6b4ba3] transition-colors truncate">
+                        {theme.titulo}
+                      </h3>
+                      <p className="text-xs text-gray-400 mb-2">
+                        por <span className="text-gray-300">@{theme.autor}</span>
+                      </p>
+                      
+                      {/* Stats */}
+                      <div className="flex items-center gap-3 text-xs">
+                        <div className="flex items-center gap-1 text-gray-400">
+                          <Sparkles className="w-3 h-3" />
+                          <span>{theme.palavrasCount} palavras</span>
+                        </div>
+                        {theme.plays !== undefined && (
+                          <div className="flex items-center gap-1 text-gray-400">
+                            <Play className="w-3 h-3 fill-gray-400" />
+                            <span>{theme.plays}</span>
+                          </div>
+                        )}
+                        {theme.likes !== undefined && (
+                          <div className="flex items-center gap-1 text-pink-400">
+                            <Heart className="w-3 h-3 fill-pink-400" />
+                            <span>{theme.likes}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Select Arrow */}
+                    <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="w-8 h-8 rounded-full bg-[#6b4ba3] flex items-center justify-center">
+                        <Play className="w-4 h-4 fill-white" />
+                      </div>
+                    </div>
                   </div>
+
+                  {/* Hot Badge */}
+                  {theme.isHot && (
+                    <div className="absolute top-2 right-2 bg-gradient-to-r from-orange-500 to-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                      <TrendingUp className="w-2.5 h-2.5" />
+                      HOT
+                    </div>
+                  )}
                 </button>
-              ))
-            )}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

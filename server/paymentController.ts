@@ -22,6 +22,9 @@ function getPaymentClient(): Payment {
   }
   
   if (!_payment) {
+    if (!_client) {
+      throw new Error('Payment client not initialized: MercadoPago config is null');
+    }
     _payment = new Payment(_client);
   }
   return _payment;

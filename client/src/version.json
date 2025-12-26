@@ -1,5 +1,6 @@
 {
-  "version": "v.2",
-  "versionNumber": 2,
-  "lastUpdated": "2025-12-01"
+  "version": "v.3.4",
+  "versionNumber": 3.4,
+  "lastUpdated": "2025-01-02",
+  "changes": "Testing deploy - Gallery auto-start feature"
 }

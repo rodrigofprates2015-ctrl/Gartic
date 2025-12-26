@@ -1305,6 +1305,250 @@ const CommunityThemesModal = ({ isOpen, onClose, onSelectTheme }: { isOpen: bool
   );
 };
 
+type WordCategory = {
+  id: string;
+  name: string;
+  emoji: string;
+  words: string[];
+  difficulty: "fácil" | "médio" | "difícil";
+  plays?: number;
+  isHot?: boolean;
+};
+
+const WORD_CATEGORIES: WordCategory[] = [
+  {
+    id: "animais",
+    name: "Animais",
+    emoji: "🦁",
+    difficulty: "fácil",
+    words: ["Leão", "Elefante", "Girafa", "Zebra", "Tigre", "Urso", "Panda", "Coala", "Canguru", "Pinguim"],
+    plays: 1250,
+    isHot: true
+  },
+  {
+    id: "frutas",
+    name: "Frutas",
+    emoji: "🍎",
+    difficulty: "fácil",
+    words: ["Abacaxi", "Banana", "Manga", "Uva", "Melancia", "Morango", "Laranja", "Limão", "Kiwi", "Maçã"],
+    plays: 980
+  },
+  {
+    id: "objetos",
+    name: "Objetos",
+    emoji: "🔧",
+    difficulty: "médio",
+    words: ["Escada", "Relógio", "Espelho", "Garfo", "Almofada", "Janela", "Tesoura", "Guarda-chuva", "Chave", "Caneta"],
+    plays: 750,
+    isHot: true
+  },
+  {
+    id: "profissoes",
+    name: "Profissões",
+    emoji: "👨‍⚕️",
+    difficulty: "médio",
+    words: ["Médico", "Professor", "Bombeiro", "Policial", "Chef", "Piloto", "Dentista", "Mecânico", "Arquiteto", "Jornalista"],
+    plays: 620
+  },
+  {
+    id: "tecnologia",
+    name: "Tecnologia",
+    emoji: "💻",
+    difficulty: "médio",
+    words: ["Computador", "Celular", "Tablet", "Mouse", "Teclado", "Monitor", "Fone", "Carregador", "Webcam", "Impressora"],
+    plays: 890
+  },
+  {
+    id: "esportes",
+    name: "Esportes",
+    emoji: "⚽",
+    difficulty: "fácil",
+    words: ["Futebol", "Basquete", "Vôlei", "Tênis", "Natação", "Corrida", "Ciclismo", "Boxe", "Judô", "Skate"],
+    plays: 1100
+  },
+  {
+    id: "comidas",
+    name: "Comidas",
+    emoji: "🍕",
+    difficulty: "fácil",
+    words: ["Pizza", "Hambúrguer", "Sushi", "Pastel", "Feijoada", "Lasanha", "Tacos", "Panqueca", "Sorvete", "Bolo"],
+    plays: 1350,
+    isHot: true
+  },
+  {
+    id: "lugares",
+    name: "Lugares",
+    emoji: "🏖️",
+    difficulty: "médio",
+    words: ["Praia", "Montanha", "Deserto", "Floresta", "Cidade", "Fazenda", "Ilha", "Caverna", "Vulcão", "Cachoeira"],
+    plays: 540
+  },
+  {
+    id: "veiculos",
+    name: "Veículos",
+    emoji: "🚗",
+    difficulty: "fácil",
+    words: ["Carro", "Moto", "Avião", "Barco", "Trem", "Ônibus", "Bicicleta", "Helicóptero", "Caminhão", "Submarino"],
+    plays: 720
+  },
+  {
+    id: "instrumentos",
+    name: "Instrumentos",
+    emoji: "🎸",
+    difficulty: "médio",
+    words: ["Violão", "Piano", "Bateria", "Flauta", "Saxofone", "Trompete", "Violino", "Harpa", "Gaita", "Pandeiro"],
+    plays: 430
+  }
+];
+
+const PalavraSecretaCategoryModal = ({ isOpen, onClose, onSelectCategory }: { isOpen: boolean; onClose: () => void; onSelectCategory: (categoryId: string) => void }) => {
+  const { toast } = useToast();
+  const [categories] = useState<WordCategory[]>(WORD_CATEGORIES);
+  const [filterDifficulty, setFilterDifficulty] = useState<"todos" | "fácil" | "médio" | "difícil">("todos");
+
+  const filteredCategories = categories.filter((cat) => {
+    return filterDifficulty === "todos" || cat.difficulty === filterDifficulty;
+  });
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={onClose}></div>
+      <div className="relative card-retro w-full max-w-2xl max-h-[80vh] overflow-hidden animate-fade-in flex flex-col">
+        <div className="p-4 border-b border-[#3d4a5c] flex items-center justify-between">
+          <h2 className="text-xl font-bold text-[#6b4ba3] flex items-center gap-2">
+            <Sparkles className="w-5 h-5" />
+            Categorias - Palavra Secreta
+          </h2>
+          <button 
+            onClick={onClose}
+            className="text-gray-400 hover:text-white transition-colors"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Difficulty Filter */}
+        <div className="p-4 border-b border-[#3d4a5c]">
+          <div className="flex gap-2">
+            <button
+              onClick={() => setFilterDifficulty("todos")}
+              className={cn(
+                "flex-1 px-3 py-2 rounded-lg text-sm font-bold transition-all",
+                filterDifficulty === "todos"
+                  ? "bg-[#6b4ba3] text-white"
+                  : "bg-[#16213e] text-gray-400 hover:text-white"
+              )}
+            >
+              Todos
+            </button>
+            <button
+              onClick={() => setFilterDifficulty("fácil")}
+              className={cn(
+                "flex-1 px-3 py-2 rounded-lg text-sm font-bold transition-all",
+                filterDifficulty === "fácil"
+                  ? "bg-green-600 text-white"
+                  : "bg-[#16213e] text-gray-400 hover:text-white"
+              )}
+            >
+              Fácil
+            </button>
+            <button
+              onClick={() => setFilterDifficulty("médio")}
+              className={cn(
+                "flex-1 px-3 py-2 rounded-lg text-sm font-bold transition-all",
+                filterDifficulty === "médio"
+                  ? "bg-yellow-600 text-white"
+                  : "bg-[#16213e] text-gray-400 hover:text-white"
+              )}
+            >
+              Médio
+            </button>
+            <button
+              onClick={() => setFilterDifficulty("difícil")}
+              className={cn(
+                "flex-1 px-3 py-2 rounded-lg text-sm font-bold transition-all",
+                filterDifficulty === "difícil"
+                  ? "bg-red-600 text-white"
+                  : "bg-[#16213e] text-gray-400 hover:text-white"
+              )}
+            >
+              Difícil
+            </button>
+          </div>
+        </div>
+        
+        <div className="flex-1 overflow-y-auto p-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {filteredCategories.map((category) => (
+              <button
+                key={category.id}
+                onClick={() => {
+                  onSelectCategory(category.id);
+                  onClose();
+                  toast({ title: "Categoria selecionada!", description: `"${category.name}" será usada na partida.` });
+                }}
+                className="group relative p-4 rounded-xl bg-[#16213e]/80 border border-[#3d4a5c] hover:border-[#6b4ba3] hover:-translate-y-1 transition-all duration-300 text-left"
+              >
+                <div className="flex items-start gap-3">
+                  {/* Category Icon/Emoji */}
+                  <div className={cn(
+                    "w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0",
+                    category.difficulty === "fácil" && "bg-gradient-to-br from-green-600 to-green-700",
+                    category.difficulty === "médio" && "bg-gradient-to-br from-yellow-600 to-yellow-700",
+                    category.difficulty === "difícil" && "bg-gradient-to-br from-red-600 to-red-700"
+                  )}>
+                    {category.emoji}
+                  </div>
+                  
+                  {/* Category Info */}
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-bold text-white group-hover:text-[#6b4ba3] transition-colors truncate">
+                      {category.name}
+                    </h3>
+                    <p className="text-xs text-gray-400 mb-2 capitalize">
+                      {category.difficulty}
+                    </p>
+                    
+                    {/* Stats */}
+                    <div className="flex items-center gap-3 text-xs">
+                      <div className="flex items-center gap-1 text-gray-400">
+                        <Sparkles className="w-3 h-3" />
+                        <span>{category.words.length} palavras</span>
+                      </div>
+                      {category.plays !== undefined && (
+                        <div className="flex items-center gap-1 text-gray-400">
+                          <Play className="w-3 h-3 fill-gray-400" />
+                          <span>{category.plays >= 1000 ? (category.plays / 1000).toFixed(1) + "k" : category.plays}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Select Arrow */}
+                  <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="w-8 h-8 rounded-full bg-[#6b4ba3] flex items-center justify-center">
+                      <Play className="w-4 h-4 fill-white" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Hot Badge */}
+                {category.isHot && (
+                  <div className="absolute top-2 right-2 bg-gradient-to-r from-orange-500 to-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                    🔥 HOT
+                  </div>
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const LobbyScreen = () => {
   const { room, user, goToModeSelect, leaveGame, kickPlayer } = useGameStore();
   const { toast } = useToast();
@@ -1455,7 +1699,9 @@ const ModeSelectScreen = () => {
   const [communityThemes, setCommunityThemes] = useState<PublicTheme[]>([]);
   const [isLoadingThemes, setIsLoadingThemes] = useState(false);
   const [selectedThemeCode, setSelectedThemeCode] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [shouldAutoStart, setShouldAutoStart] = useState(false);
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
 
   const isHost = room && user && room.hostId === user.uid;
 
@@ -1697,6 +1943,60 @@ const ModeSelectScreen = () => {
             </Link>
           </div>
         )}
+
+        {selectedMode === 'palavraSecreta' && (
+          <div className="mt-4 pt-4 border-t border-[#3d4a5c]">
+            <h3 className="text-white font-bold mb-3 flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-[#4a90a4]" />
+              Categorias de Palavras
+            </h3>
+            
+            {selectedCategory ? (
+              <div className="p-4 rounded-2xl border-2 border-[#6b4ba3] bg-[#6b4ba3]/10 mb-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#6b4ba3] to-[#4a3070] flex items-center justify-center">
+                    <Check className="w-6 h-6 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold text-[#6b4ba3]">Categoria Selecionada</p>
+                    <p className="text-xs text-gray-400 capitalize">
+                      {WORD_CATEGORIES.find(c => c.id === selectedCategory)?.name || selectedCategory}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setSelectedCategory(null)}
+                    className="text-gray-400 hover:text-white transition-colors"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+            ) : null}
+            
+            <button
+              onClick={() => setShowCategoryModal(true)}
+              className="group relative p-6 rounded-2xl border-2 border-dashed border-[#3d4a5c] hover:border-[#6b4ba3] bg-[#16213e]/20 hover:bg-[#16213e]/40 transition-all duration-300 cursor-pointer text-center w-full"
+            >
+              <div className="flex flex-col items-center gap-3">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#6b4ba3] to-[#4a3070] flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Sparkles className="w-8 h-8 text-white" />
+                </div>
+                <div>
+                  <h4 className="text-lg font-bold text-white group-hover:text-[#6b4ba3] transition-colors">
+                    {selectedCategory ? 'Trocar Categoria' : 'Escolher Categoria'}
+                  </h4>
+                  <p className="text-sm text-gray-400 mt-1">
+                    Selecione uma categoria de palavras para jogar!
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-gray-500">
+                  <Play className="w-3 h-3" />
+                  <span>10 categorias disponíveis</span>
+                </div>
+              </div>
+            </button>
+          </div>
+        )}
       </div>
 
       <Button 
@@ -1706,6 +2006,12 @@ const ModeSelectScreen = () => {
       >
         <Rocket className="mr-2" /> INICIAR PARTIDA
       </Button>
+
+      <PalavraSecretaCategoryModal 
+        isOpen={showCategoryModal}
+        onClose={() => setShowCategoryModal(false)}
+        onSelectCategory={(categoryId) => setSelectedCategory(categoryId)}
+      />
     </div>
   );
 };

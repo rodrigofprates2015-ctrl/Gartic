@@ -190,6 +190,12 @@
       const size = options.size || 'auto';
       const showLabel = options.showLabel !== false;
       
+      // Se tem banner customizado, usar template especial
+      if (item.customBanner) {
+        return this.createCustomBannerHTML(item, slotId, showLabel);
+      }
+      
+      // Banner padrão com imagem
       return `
         <div class="destaque-visual" data-content-id="${item.id}" data-slot="${slotId}">
           ${showLabel ? '<div class="visual-label">Parceiro</div>' : ''}
@@ -202,6 +208,43 @@
                  alt="${item.altText}" 
                  class="visual-image"
                  loading="lazy">
+          </a>
+        </div>
+      `;
+    }
+
+    /**
+     * Cria HTML de banner customizado (sem imagem externa)
+     * @param {Object} item - Dados do anúncio
+     * @param {string} slotId - ID do slot
+     * @param {boolean} showLabel - Mostrar label
+     * @returns {string} HTML do banner customizado
+     */
+    createCustomBannerHTML(item, slotId, showLabel) {
+      return `
+        <div class="destaque-visual custom-banner" data-content-id="${item.id}" data-slot="${slotId}">
+          ${showLabel ? '<div class="visual-label">Parceiro Amazon</div>' : ''}
+          <a href="${item.affiliateLink}" 
+             class="partner-link custom-link" 
+             target="_blank" 
+             rel="noopener noreferrer sponsored"
+             aria-label="${item.altText}">
+            <div class="custom-banner-content">
+              <div class="custom-banner-left">
+                <div class="custom-banner-icon">${item.productIcon || '🎮'}</div>
+              </div>
+              <div class="custom-banner-center">
+                ${item.productBadge ? `<div class="custom-banner-badge">${item.productBadge}</div>` : ''}
+                <h3 class="custom-banner-title">${item.productName}</h3>
+                <p class="custom-banner-description">${item.productDescription}</p>
+              </div>
+              <div class="custom-banner-right">
+                <div class="custom-banner-cta">
+                  <span class="custom-banner-price">${item.productPrice}</span>
+                  <span class="custom-banner-arrow">→</span>
+                </div>
+              </div>
+            </div>
           </a>
         </div>
       `;

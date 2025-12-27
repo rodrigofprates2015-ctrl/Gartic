@@ -15,27 +15,45 @@ const partnerContentData = [
   // Produtos Amazon - Alta Prioridade
   {
     id: 'amz-001',
-    imageUrl: 'https://via.placeholder.com/728x90/6b4ba3/ffffff?text=Mouse+Gamer+RGB+-+R$+89,90',
-    affiliateLink: 'https://amzn.to/exemplo-mouse-gamer',
-    altText: 'Mouse Gamer RGB com 7 botões programáveis',
+    imageUrl: 'https://via.placeholder.com/728x90/6b4ba3/ffffff?text=Mouse+Gamer+RGB+-+Clique+Aqui',
+    affiliateLink: 'https://amzn.to/4phmY4v',
+    altText: 'Mouse Gamer RGB com 7 botões programáveis - Oferta Amazon',
     category: 'all',
-    weight: 10
+    weight: 10,
+    customBanner: true,
+    productName: 'Mouse Gamer RGB',
+    productDescription: 'Alta precisão, 7 botões programáveis',
+    productPrice: 'Ver preço na Amazon',
+    productBadge: '⚡ OFERTA',
+    productIcon: '🖱️'
   },
   {
     id: 'amz-002',
-    imageUrl: 'https://via.placeholder.com/300x250/e07b39/ffffff?text=Teclado+Mecânico+-+R$+199,90',
-    affiliateLink: 'https://amzn.to/exemplo-teclado',
+    imageUrl: 'https://via.placeholder.com/300x250/e07b39/ffffff?text=Teclado+Mecânico+-+Clique+Aqui',
+    affiliateLink: 'https://amzn.to/4phmY4v',
     altText: 'Teclado Mecânico RGB Switch Blue',
     category: 'desktop',
-    weight: 9
+    weight: 9,
+    customBanner: true,
+    productName: 'Teclado Mecânico RGB',
+    productDescription: 'Switch Blue, iluminação personalizável',
+    productPrice: 'Ver na Amazon',
+    productBadge: '🔥 POPULAR',
+    productIcon: '⌨️'
   },
   {
     id: 'amz-003',
-    imageUrl: 'https://via.placeholder.com/320x100/4a90a4/ffffff?text=Headset+Gamer+-+R$+149,90',
-    affiliateLink: 'https://amzn.to/exemplo-headset',
+    imageUrl: 'https://via.placeholder.com/320x100/4a90a4/ffffff?text=Headset+Gamer+-+Clique+Aqui',
+    affiliateLink: 'https://amzn.to/4phmY4v',
     altText: 'Headset Gamer 7.1 Surround',
     category: 'all',
-    weight: 8
+    weight: 8,
+    customBanner: true,
+    productName: 'Headset Gamer 7.1',
+    productDescription: 'Som surround, microfone com cancelamento',
+    productPrice: 'Ver oferta',
+    productBadge: '⭐ TOP',
+    productIcon: '🎧'
   },
 
   // Produtos Shopee - Média Prioridade

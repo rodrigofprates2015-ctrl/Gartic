@@ -220,3 +220,185 @@
   transform: translateZ(0);
   backface-visibility: hidden;
 }
+
+/* ========================================
+   CUSTOM BANNER STYLES (Sem imagem externa)
+   ======================================== */
+
+.custom-banner {
+  min-height: 90px;
+  background: linear-gradient(135deg, 
+    rgba(107, 75, 163, 0.15) 0%, 
+    rgba(74, 144, 164, 0.15) 50%,
+    rgba(224, 123, 57, 0.15) 100%
+  );
+}
+
+.custom-link {
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+}
+
+.custom-banner-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+}
+
+/* Ícone do produto */
+.custom-banner-left {
+  flex-shrink: 0;
+}
+
+.custom-banner-icon {
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #6b4ba3 0%, #4a90a4 100%);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  box-shadow: 0 4px 12px rgba(107, 75, 163, 0.3);
+  transition: transform 0.3s ease;
+}
+
+.custom-link:hover .custom-banner-icon {
+  transform: scale(1.1) rotate(5deg);
+}
+
+/* Conteúdo central */
+.custom-banner-center {
+  flex: 1;
+  min-width: 0;
+}
+
+.custom-banner-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, #e07b39 0%, #c44536 100%);
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  margin-bottom: 4px;
+  box-shadow: 0 2px 4px rgba(224, 123, 57, 0.3);
+}
+
+.custom-banner-title {
+  color: white;
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0 0 4px 0;
+  line-height: 1.2;
+}
+
+.custom-banner-description {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 13px;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* CTA (Call to Action) */
+.custom-banner-right {
+  flex-shrink: 0;
+}
+
+.custom-banner-cta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  padding: 8px 12px;
+  background: rgba(107, 75, 163, 0.2);
+  border-radius: 8px;
+  border: 1px solid rgba(107, 75, 163, 0.3);
+  transition: all 0.3s ease;
+}
+
+.custom-link:hover .custom-banner-cta {
+  background: rgba(107, 75, 163, 0.3);
+  border-color: rgba(107, 75, 163, 0.5);
+  transform: translateX(-4px);
+}
+
+.custom-banner-price {
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.custom-banner-arrow {
+  color: #6b4ba3;
+  font-size: 20px;
+  font-weight: 700;
+  transition: transform 0.3s ease;
+}
+
+.custom-link:hover .custom-banner-arrow {
+  transform: translateX(4px);
+}
+
+/* Responsividade - Mobile */
+@media (max-width: 768px) {
+  .custom-banner-content {
+    gap: 0.75rem;
+  }
+
+  .custom-banner-icon {
+    width: 50px;
+    height: 50px;
+    font-size: 28px;
+  }
+
+  .custom-banner-title {
+    font-size: 16px;
+  }
+
+  .custom-banner-description {
+    font-size: 12px;
+  }
+
+  .custom-banner-cta {
+    padding: 6px 10px;
+  }
+
+  .custom-banner-price {
+    font-size: 11px;
+  }
+
+  .custom-banner-arrow {
+    font-size: 18px;
+  }
+}
+
+/* Mobile muito pequeno - Layout vertical */
+@media (max-width: 480px) {
+  .custom-banner-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.5rem;
+  }
+
+  .custom-banner-center {
+    order: 2;
+  }
+
+  .custom-banner-right {
+    order: 3;
+    width: 100%;
+  }
+
+  .custom-banner-cta {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }
+}

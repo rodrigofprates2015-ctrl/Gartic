@@ -138,11 +138,21 @@
       }
 
       // Filtrar por dispositivo
-      const filteredItems = this.filterByDevice();
+      let filteredItems = this.filterByDevice();
+      
+      // Filtrar por posição se especificado
+      if (options.position) {
+        filteredItems = filteredItems.filter(item => 
+          item.position === options.position || !item.position
+        );
+      } else {
+        // Se não especificou posição, excluir itens com posição definida
+        filteredItems = filteredItems.filter(item => !item.position);
+      }
       
       if (filteredItems.length === 0) {
         if (CONFIG.debugMode) {
-          console.warn('[Partner Content] No items available for device:', this.deviceType);
+          console.warn('[Partner Content] No items available for device:', this.deviceType, 'position:', options.position);
         }
         return;
       }
@@ -221,8 +231,11 @@
      * @returns {string} HTML do banner customizado
      */
     createCustomBannerHTML(item, slotId, showLabel) {
+      const isVertical = item.position === 'left' || item.position === 'right';
+      const verticalClass = isVertical ? 'vertical-banner' : '';
+      
       return `
-        <div class="destaque-visual custom-banner" data-content-id="${item.id}" data-slot="${slotId}">
+        <div class="destaque-visual custom-banner ${verticalClass}" data-content-id="${item.id}" data-slot="${slotId}">
           ${showLabel ? '<div class="visual-label">Parceiro Amazon</div>' : ''}
           <a href="${item.affiliateLink}" 
              class="partner-link custom-link" 
@@ -324,7 +337,9 @@
           { id: 'partner-slot-middle', options: { size: 'large' } },
           { id: 'partner-slot-bottom', options: { size: 'large' } },
           { id: 'partner-slot-before-card', options: { size: 'medium' } },
-          { id: 'partner-slot-after-card', options: { size: 'medium' } }
+          { id: 'partner-slot-after-card', options: { size: 'medium' } },
+          { id: 'partner-slot-left', options: { size: 'small', position: 'left' } },
+          { id: 'partner-slot-right', options: { size: 'small', position: 'right' } }
         ];
 
         // Renderizar cada slot

@@ -44,6 +44,20 @@ export default function Prototipo() {
         backgroundRepeat: 'no-repeat'
       }}
     >
+      {/* BLOCO DE ANÚNCIO - LATERAL ESQUERDA (Desktop only) */}
+      <div 
+        id="partner-slot-left" 
+        className="partner-content-wrapper hidden xl:block fixed left-4 top-1/2 -translate-y-1/2 z-30"
+        style={{ width: '160px' }}
+      ></div>
+
+      {/* BLOCO DE ANÚNCIO - LATERAL DIREITA (Desktop only) */}
+      <div 
+        id="partner-slot-right" 
+        className="partner-content-wrapper hidden xl:block fixed right-4 top-1/2 -translate-y-1/2 z-30"
+        style={{ width: '160px' }}
+      ></div>
+
       {/* BLOCO DE ANÚNCIO - TOPO */}
       <div id="partner-slot-top" className="partner-content-wrapper" style={{ maxWidth: '728px', margin: '1rem auto' }}></div>
 

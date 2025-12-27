@@ -56,30 +56,36 @@ const partnerContentData = [
     productIcon: '🎧'
   },
 
-  // Produtos Shopee - Média Prioridade
+  // Produtos Shopee - Banners Laterais Verticais
   {
     id: 'shp-001',
-    imageUrl: 'https://via.placeholder.com/728x90/c44536/ffffff?text=Mousepad+XXL+-+R$+39,90',
+    imageUrl: '',
     affiliateLink: 'https://shope.ee/exemplo-mousepad',
     altText: 'Mousepad Gamer XXL 90x40cm',
-    category: 'all',
-    weight: 7
+    category: 'desktop',
+    weight: 7,
+    customBanner: true,
+    productName: 'Mousepad XXL',
+    productDescription: '90x40cm, base antiderrapante',
+    productPrice: 'Ver na Shopee',
+    productBadge: '💰 BARATO',
+    productIcon: '🖱️',
+    position: 'left'  // Banner lateral esquerdo
   },
   {
     id: 'shp-002',
-    imageUrl: 'https://via.placeholder.com/300x250/6b4ba3/ffffff?text=Cadeira+Gamer+-+R$+699,90',
+    imageUrl: '',
     affiliateLink: 'https://shope.ee/exemplo-cadeira',
     altText: 'Cadeira Gamer Ergonômica com Apoio Lombar',
     category: 'desktop',
-    weight: 6
-  },
-  {
-    id: 'shp-003',
-    imageUrl: 'https://via.placeholder.com/320x100/e07b39/ffffff?text=Suporte+Monitor+-+R$+79,90',
-    affiliateLink: 'https://shope.ee/exemplo-suporte',
-    altText: 'Suporte Articulado para Monitor',
-    category: 'desktop',
-    weight: 5
+    weight: 6,
+    customBanner: true,
+    productName: 'Cadeira Gamer',
+    productDescription: 'Ergonômica, reclinável 180°',
+    productPrice: 'Ver oferta',
+    productBadge: '🪑 CONFORTO',
+    productIcon: '🪑',
+    position: 'right'  // Banner lateral direito
   },
 
   // Parcerias Diretas - Baixa Prioridade

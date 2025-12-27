@@ -13,9 +13,9 @@ export default function Prototipo() {
   const [saveNicknameChecked, setSaveNicknameChecked] = useState(false);
 
   useEffect(() => {
-    // Carregar o sistema de anúncios
+    // Carregar o sistema de anúncios comparativos
     const script = document.createElement('script');
-    script.src = '/ad-engine.js';
+    script.src = '/price-comparison-engine.js';
     script.async = true;
     document.body.appendChild(script);
 
@@ -44,22 +44,22 @@ export default function Prototipo() {
         backgroundRepeat: 'no-repeat'
       }}
     >
-      {/* BLOCO DE ANÚNCIO - LATERAL ESQUERDA (Desktop only) */}
+      {/* BLOCO DE ANÚNCIO - LATERAL ESQUERDA (Desktop only) - 160x600 */}
       <div 
-        id="partner-slot-left" 
-        className="partner-content-wrapper hidden xl:block fixed left-4 top-1/2 -translate-y-1/2 z-30"
+        id="price-comp-160x600-left" 
+        className="hidden xl:block fixed left-4 top-1/2 -translate-y-1/2 z-30"
         style={{ width: '160px' }}
       ></div>
 
-      {/* BLOCO DE ANÚNCIO - LATERAL DIREITA (Desktop only) */}
+      {/* BLOCO DE ANÚNCIO - LATERAL DIREITA (Desktop only) - 160x600 */}
       <div 
-        id="partner-slot-right" 
-        className="partner-content-wrapper hidden xl:block fixed right-4 top-1/2 -translate-y-1/2 z-30"
+        id="price-comp-160x600-right" 
+        className="hidden xl:block fixed right-4 top-1/2 -translate-y-1/2 z-30"
         style={{ width: '160px' }}
       ></div>
 
-      {/* BLOCO DE ANÚNCIO - TOPO */}
-      <div id="partner-slot-top" className="partner-content-wrapper" style={{ maxWidth: '728px', margin: '1rem auto' }}></div>
+      {/* BLOCO DE ANÚNCIO - TOPO - 728x90 */}
+      <div id="price-comp-728x90-top" style={{ maxWidth: '728px', margin: '1rem auto' }}></div>
 
       {/* Hero Banner - Oficina de Temas */}
       <Link 
@@ -89,8 +89,8 @@ export default function Prototipo() {
 
       {/* Main content area - flex-grow to push footer down */}
       <div className="flex-1 flex flex-col items-center justify-center pt-20 md:pt-24 px-4 relative z-20">
-        {/* BLOCO DE ANÚNCIO - ANTES DO CARD */}
-        <div id="partner-slot-before-card" className="partner-content-wrapper mb-6" style={{ maxWidth: '468px', width: '100%' }}></div>
+        {/* BLOCO DE ANÚNCIO - ANTES DO CARD - 300x250 */}
+        <div id="price-comp-300x250-before" className="mb-6" style={{ maxWidth: '300px', width: '100%' }}></div>
 
         {/* Main card */}
         <div className="main-card w-[90%] max-w-md p-5 md:p-6 animate-fade-in">
@@ -160,12 +160,12 @@ export default function Prototipo() {
           </div>
         </div>
 
-        {/* BLOCO DE ANÚNCIO - DEPOIS DO CARD */}
-        <div id="partner-slot-after-card" className="partner-content-wrapper mt-6" style={{ maxWidth: '468px', width: '100%' }}></div>
+        {/* BLOCO DE ANÚNCIO - DEPOIS DO CARD - 300x250 */}
+        <div id="price-comp-300x250-after" className="mt-6" style={{ maxWidth: '300px', width: '100%' }}></div>
       </div>
 
-      {/* BLOCO DE ANÚNCIO - RODAPÉ */}
-      <div id="partner-slot-bottom" className="partner-content-wrapper" style={{ maxWidth: '728px', margin: '1rem auto' }}></div>
+      {/* BLOCO DE ANÚNCIO - RODAPÉ - 728x90 */}
+      <div id="price-comp-728x90-bottom" style={{ maxWidth: '728px', margin: '1rem auto' }}></div>
 
       {/* Footer - now below the content, takes full width */}
       <div className="w-full text-center py-6 px-4 bg-gradient-to-t from-black/40 to-transparent z-20 relative border-t border-[#3d4a5c]/30">

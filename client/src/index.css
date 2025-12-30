@@ -479,28 +479,28 @@
   }
 
   .hero-banner-text-main {
-    font-family: "Changa One", sans-serif;
-    font-size: 2rem;
-    font-weight: 400;
-    color: #ffffff;
-    line-height: 1;
-    letter-spacing: 0.02em;
-    text-shadow: none;
-    text-transform: uppercase;
+    font-family: "Changa One", sans-serif !important;
+    font-size: 2rem !important;
+    font-weight: 400 !important;
+    color: #ffffff !important;
+    line-height: 1 !important;
+    letter-spacing: 0.02em !important;
+    text-shadow: none !important;
+    text-transform: uppercase !important;
   }
 
   .hero-banner-text-price {
-    font-family: "Changa One", sans-serif;
-    font-size: 1.8rem;
-    font-weight: 400;
-    color: #ffffff;
-    line-height: 1;
-    letter-spacing: 0.02em;
-    text-shadow: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.25rem;
-    text-transform: uppercase;
+    font-family: "Changa One", sans-serif !important;
+    font-size: 1.8rem !important;
+    font-weight: 400 !important;
+    color: #ffffff !important;
+    line-height: 1 !important;
+    letter-spacing: 0.02em !important;
+    text-shadow: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.25rem !important;
+    text-transform: uppercase !important;
   }
 
   .hero-banner-text-price::before {
@@ -516,10 +516,10 @@
       gap: 1.5rem;
     }
     .hero-banner-text-main {
-      font-size: 2.5rem;
+      font-size: 2.5rem !important;
     }
     .hero-banner-text-price {
-      font-size: 2.2rem;
+      font-size: 2.2rem !important;
     }
     .hero-banner-text-price::before {
       display: none;

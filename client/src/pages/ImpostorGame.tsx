@@ -900,6 +900,42 @@ const getModeEmoji = (modeId: string) => {
   }
 };
 
+const getModeIcon = (modeId: string) => {
+  switch (modeId) {
+    case 'palavraSecreta': return MessageSquare;
+    case 'palavras': return MapPin;
+    case 'duasFaccoes': return Swords;
+    case 'categoriaItem': return Target;
+    case 'perguntasDiferentes': return HelpCircle;
+    case 'palavraComunidade': return Users;
+    default: return Gamepad2;
+  }
+};
+
+const getModeTheme = (modeId: string) => {
+  switch (modeId) {
+    case 'palavraSecreta': return 'blue';
+    case 'palavras': return 'green';
+    case 'duasFaccoes': return 'red';
+    case 'categoriaItem': return 'yellow';
+    case 'perguntasDiferentes': return 'purple';
+    case 'palavraComunidade': return 'pink';
+    default: return 'blue';
+  }
+};
+
+const getModeDifficulty = (modeId: string) => {
+  switch (modeId) {
+    case 'palavraSecreta': return 'Fácil';
+    case 'palavras': return 'Médio';
+    case 'duasFaccoes': return 'Difícil';
+    case 'categoriaItem': return 'Médio';
+    case 'perguntasDiferentes': return 'Difícil';
+    case 'palavraComunidade': return 'Custom';
+    default: return 'Médio';
+  }
+};
+
 const HomeScreen = () => {
   const { setUser, createRoom, joinRoom, isLoading, loadSavedNickname, saveNickname, clearSavedNickname, savedNickname } = useGameStore();
   const [name, setNameInput] = useState("");
@@ -1834,59 +1870,115 @@ const ModeSelectScreen = () => {
   if (!room) return null;
 
   return (
-    <div className="flex flex-col w-full max-w-4xl h-full py-6 px-4 animate-fade-in relative z-10">
+    <div className="flex flex-col w-full max-w-6xl h-full py-6 px-4 animate-fade-in relative z-10">
       {/* Elementos decorativos de fundo */}
-      <div className="bg-blur-purple fixed top-20 left-10 w-64 h-64 opacity-20 pointer-events-none"></div>
-      <div className="bg-blur-blue fixed bottom-20 right-10 w-80 h-80 opacity-20 pointer-events-none"></div>
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <div className="absolute top-[-10%] right-[-5%] w-96 h-96 bg-purple-600/20 rounded-full blur-[100px] animate-pulse"></div>
+        <div className="absolute bottom-[-10%] left-[-5%] w-96 h-96 bg-blue-600/20 rounded-full blur-[100px] animate-pulse" style={{ animationDelay: '1000ms' }}></div>
+        <div className="absolute top-20 left-10 text-slate-700/20 animate-bounce" style={{ animationDuration: '3000ms' }}><Gamepad2 size={64} /></div>
+        <div className="absolute bottom-40 right-10 text-slate-700/20 animate-bounce" style={{ animationDuration: '4000ms' }}><Rocket size={56} /></div>
+      </div>
       
-      <div className="panel">
-        <div className="flex items-center gap-4 mb-6">
-          <Button 
-            variant="ghost" 
-            size="icon"
+      <div className="bg-[#242642] rounded-[3rem] p-6 md:p-10 shadow-2xl border-4 border-[#2f3252] relative z-10">
+        <div className="flex flex-col md:flex-row items-center md:items-start gap-4 mb-8 text-center md:text-left">
+          <button 
             onClick={handleBackClick}
-            className="w-10 h-10 rounded-lg border border-[#3d4a5c] hover:border-[#4a90a4] text-gray-300 hover:text-[#4a90a4] transition-all"
+            className="p-3 bg-slate-800 rounded-2xl hover:bg-slate-700 transition-colors border-b-4 border-slate-950 active:border-b-0 active:translate-y-1 text-slate-400 hover:text-white"
             data-testid="button-back-to-lobby"
             title={isHost ? "Voltar ao lobby (todos os jogadores serão levados)" : "Voltar ao lobby"}
           >
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-          <div>
-            <h2 className="text-2xl font-bold text-white drop-shadow-lg">Escolha o Modo</h2>
-            <p className="text-gray-200 text-sm">Selecione como jogar</p>
+            <ArrowLeft size={24} strokeWidth={3} />
+          </button>
+          <div className="flex-1">
+            <h2 className="text-2xl md:text-3xl font-black text-white mb-2">
+              Como vamos jogar hoje?
+            </h2>
+            <p className="text-slate-400 font-medium text-base md:text-lg max-w-2xl">
+              Selecione o modo que mais combina com a sua galera. O Impostor está pronto...
+            </p>
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto pb-4 scrollbar-hide">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {gameModes.map((mode) => (
-              <button
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+          {gameModes.map((mode, index) => {
+            const Icon = getModeIcon(mode.id);
+            const theme = getModeTheme(mode.id);
+            const difficulty = getModeDifficulty(mode.id);
+            const isSelected = selectedMode === mode.id;
+            const isRecommended = mode.id === 'palavraSecreta';
+            
+            const themeColors = {
+              blue: { bg: 'bg-blue-500', border: 'border-blue-700', iconBg: 'bg-blue-600' },
+              green: { bg: 'bg-emerald-500', border: 'border-emerald-700', iconBg: 'bg-emerald-600' },
+              red: { bg: 'bg-rose-500', border: 'border-rose-700', iconBg: 'bg-rose-600' },
+              yellow: { bg: 'bg-amber-400', border: 'border-amber-600', iconBg: 'bg-amber-500' },
+              purple: { bg: 'bg-violet-500', border: 'border-violet-700', iconBg: 'bg-violet-600' },
+              pink: { bg: 'bg-pink-500', border: 'border-pink-700', iconBg: 'bg-pink-600' }
+            };
+            
+            const colors = themeColors[theme as keyof typeof themeColors];
+            
+            return (
+              <div 
                 key={mode.id}
                 onClick={() => selectMode(mode.id as GameModeType)}
                 className={cn(
-                  "card text-left",
-                  selectedMode === mode.id && "selected theme-purple"
+                  "relative p-5 rounded-3xl cursor-pointer transition-all duration-200 flex flex-col gap-4 h-full border-4",
+                  isSelected 
+                    ? `${colors.bg} ${colors.border} -translate-y-2 shadow-[0_10px_0_0_rgba(0,0,0,0.2)]` 
+                    : 'bg-slate-800 border-slate-900 hover:bg-slate-750 hover:-translate-y-1 hover:border-slate-700 shadow-lg'
                 )}
               >
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-lg flex items-center justify-center text-2xl shrink-0 bg-black/20">
-                    {getModeEmoji(mode.id)}
+                {/* Badge Recomendado */}
+                {isRecommended && !isSelected && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-yellow-400 text-yellow-900 text-xs font-black px-3 py-1 rounded-full border-2 border-yellow-600 shadow-sm z-10 flex items-center gap-1 w-max">
+                    <Star size={12} fill="currentColor" /> RECOMENDADO
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-white font-bold text-lg">{mode.title}</h3>
-                    <p className="text-gray-200 text-sm mt-1">{mode.desc}</p>
+                )}
+
+                {/* Check Icon */}
+                {isSelected && (
+                  <div className="absolute -top-3 -right-3 bg-white text-green-600 rounded-full p-1 border-4 border-green-600 shadow-sm animate-in zoom-in spin-in-12 duration-300">
+                    <Check size={20} strokeWidth={4} />
                   </div>
-                  {selectedMode === mode.id && (
-                    <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center shrink-0">
-                      <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                      </svg>
-                    </div>
-                  )}
+                )}
+
+                {/* Header do Card */}
+                <div className="flex justify-between items-start">
+                  <div className={cn(
+                    "p-3 rounded-2xl border-2 border-black/10",
+                    isSelected ? 'bg-white/20 text-white' : `${colors.bg} text-white`
+                  )}>
+                    <Icon size={32} strokeWidth={2.5} />
+                  </div>
+                  
+                  <div className={cn(
+                    "text-xs font-bold px-3 py-1 rounded-full border-2 border-black/10",
+                    isSelected ? 'bg-black/20 text-white' : 'bg-slate-900 text-slate-400'
+                  )}>
+                    {difficulty.toUpperCase()}
+                  </div>
                 </div>
-              </button>
-            ))}
-          </div>
+
+                {/* Conteúdo */}
+                <div className="flex flex-col gap-1">
+                  <h3 className={cn(
+                    "font-black text-xl leading-tight",
+                    isSelected ? 'text-white' : 'text-slate-100'
+                  )}>
+                    {mode.title}
+                  </h3>
+                  <p className={cn(
+                    "text-sm font-medium leading-relaxed",
+                    isSelected ? 'text-white/90' : 'text-slate-400'
+                  )}>
+                    {mode.desc}
+                  </p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
         
         {selectedMode === 'palavraComunidade' && (
           <div className="mt-4 pt-4 border-t border-[#3d4a5c]">
@@ -1992,15 +2084,23 @@ const ModeSelectScreen = () => {
             </button>
           </div>
         )}
-        </div>
 
-        <Button 
-          onClick={handleStartGameWithSorteio}
-          disabled={!selectedMode || isStarting || (selectedMode === 'palavraComunidade' && !selectedThemeCode)}
-          className="btn btn-cta w-full mt-6 justify-center text-lg"
-        >
-          <Rocket className="mr-2" /> INICIAR PARTIDA
-        </Button>
+        {/* CTA Principal */}
+        <div className="flex flex-col items-center">
+          <button 
+            onClick={handleStartGameWithSorteio}
+            disabled={!selectedMode || isStarting || (selectedMode === 'palavraComunidade' && !selectedThemeCode)}
+            className={cn(
+              "w-full md:w-auto md:min-w-[300px] px-8 py-5 rounded-2xl font-black text-xl tracking-wide flex items-center justify-center gap-3 transition-all duration-300 border-b-[6px] shadow-2xl",
+              selectedMode && !(selectedMode === 'palavraComunidade' && !selectedThemeCode)
+                ? 'bg-gradient-to-r from-green-500 to-emerald-500 border-green-800 text-white hover:brightness-110 active:border-b-0 active:translate-y-2' 
+                : 'bg-slate-700 border-slate-900 text-slate-500 cursor-not-allowed opacity-50'
+            )}
+          >
+            <Rocket size={28} className={selectedMode && !(selectedMode === 'palavraComunidade' && !selectedThemeCode) ? 'animate-bounce' : ''} />
+            {selectedMode && !(selectedMode === 'palavraComunidade' && !selectedThemeCode) ? 'INICIAR PARTIDA' : 'SELECIONE UM MODO'}
+          </button>
+        </div>
       </div>
 
       <PalavraSecretaCategoryModal 

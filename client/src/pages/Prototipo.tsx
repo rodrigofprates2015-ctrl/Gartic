@@ -21,11 +21,11 @@ export default function Prototipo() {
   const rightAd = getRandomAdByFormat('160x600');
 
   const handleCreate = () => {
-    alert('Botão CRIAR SALA clicado! (Página de teste)');
+    // Lógica de criar sala será implementada aqui
   };
 
   const handleJoin = () => {
-    alert('Botão ENTRAR clicado! (Página de teste)');
+    // Lógica de entrar na sala será implementada aqui
   };
 
   return (

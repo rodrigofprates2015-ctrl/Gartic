@@ -487,11 +487,10 @@
     letter-spacing: 0.02em !important;
     text-shadow: none !important;
     text-transform: uppercase !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
+    white-space: normal !important;
     margin: 0 !important;
     padding: 0 !important;
+    max-width: 100% !important;
   }
 
   .hero-banner-text-price {
@@ -511,6 +510,7 @@
     }
     .hero-banner-text-main {
       font-size: 2.5rem !important;
+      white-space: nowrap !important;
     }
   }
 

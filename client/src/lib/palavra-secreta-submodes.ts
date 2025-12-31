@@ -1,4 +1,4 @@
-export type PalavraSuperSecretaSubmode = 'classico' | 'natal' | 'estrategia' | 'animes' | 'herois' | 'seriesMisterio' | 'valorant';
+export type PalavraSuperSecretaSubmode = 'classico' | 'natal' | 'estrategia' | 'animes' | 'herois' | 'seriesMisterio' | 'valorant' | 'futebol' | 'disney';
 
 export const PALAVRA_SECRETA_SUBMODES: Record<PalavraSuperSecretaSubmode, { title: string; desc: string; longDesc?: string; words: string[]; image?: string }> = {
   classico: {
@@ -50,6 +50,20 @@ export const PALAVRA_SECRETA_SUBMODES: Record<PalavraSuperSecretaSubmode, { titl
     longDesc: 'Teste seu conhecimento e blefe com seus amigos usando termos do Stranger Things. Nossa lista inclui personagens enigmáticos, locais misteriosos e criaturas sobrenaturais.',
     image: '/submode-stranger-things.png',
     words: ['Eleven', 'Mike', 'Lucas', 'Dustin', 'Will', 'Max', 'Hopper', 'Joyce', 'Vecna', 'Demogorgon', 'Mind Flayer', 'Hawkins', 'Upside Down', 'Barb', 'Robin', 'Steve', 'Billy', 'Eddie', 'Murray', 'Kali', 'Brenner', 'Suzie', 'Erica', 'Laboratório', 'Neva', 'Walkie-talkie', 'Arcade', 'Starcourt', 'Hellfire', 'Byers']
+  },
+  futebol: {
+    title: 'Futebol',
+    desc: 'Times brasileiros de futebol',
+    longDesc: 'Teste seu conhecimento e blefe com seus amigos usando nomes dos principais times de futebol do Brasil. Criado por Maylon.',
+    image: 'https://media.torcedores.com/wp-content/uploads/2025/01/clubes-brasileiros-torcedores-768x512.webp',
+    words: ['Flamengo', 'Corinthians', 'São Paulo', 'Palmeiras', 'Santos', 'Vasco da Gama', 'Cruzeiro', 'Grêmio', 'Internacional', 'Atlético Mineiro', 'Fluminense', 'Botafogo', 'Atlético Paranaense', 'Bahia', 'Esporte', 'Vitória', 'Coritiba', 'Goiás', 'Fortaleza', 'Ceará']
+  },
+  disney: {
+    title: 'Disney',
+    desc: 'Personagens e filmes da Disney',
+    longDesc: 'Teste seu conhecimento e blefe com seus amigos usando termos do universo Disney. Nossa lista inclui personagens clássicos, princesas, filmes e muito mais. Criado por @Luciana.',
+    image: 'https://lumiere-a.akamaihd.net/v1/images/au_shop_disney_po_card_m_b2c9fa25.jpeg?region=0,0,1024,640&width=768',
+    words: ['Mickey', 'Minnie', 'Donald', 'Pateta', 'Plutão', 'Princesa', 'Castelo', 'Pixar', 'Maravilha', 'Star Wars', 'Congelado', 'Elsa', 'Ana', 'Simba', 'Rei Leão', 'Aladdin', 'Jasmim', 'Ariel', 'Moana', 'Rapunzel', 'Encanto', 'Buzz Lightyear', 'Woody', 'Toy Story', 'Nemo', 'Monstros SA', 'Ponto', 'Pocahontas', 'Bela', 'Fera']
   },
   valorant: {
     title: 'Valorant',

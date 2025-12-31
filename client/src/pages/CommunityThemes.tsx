@@ -33,22 +33,82 @@ export default function CommunityThemes() {
   const loadPublicThemes = async () => {
     setIsLoadingThemes(true);
     try {
+      // Featured community themes (hardcoded)
+      const featuredThemes: PublicTheme[] = [
+        {
+          id: 'futebol-maylon',
+          titulo: 'Futebol',
+          autor: 'Maylon',
+          palavrasCount: 20,
+          accessCode: 'FUTEBOL',
+          createdAt: new Date().toISOString(),
+          emoji: '⚽',
+          plays: 1250,
+          likes: 340,
+          isHot: true,
+        },
+        {
+          id: 'disney-luciana',
+          titulo: 'Disney',
+          autor: '@Luciana',
+          palavrasCount: 30,
+          accessCode: 'DISNEY',
+          createdAt: new Date().toISOString(),
+          emoji: '🏰',
+          plays: 980,
+          likes: 285,
+          isHot: true,
+        }
+      ];
+
       const res = await fetch("/api/themes/public");
       if (res.ok) {
         const themes = await res.json();
         // Enrich themes with mock data for better UX
         const enrichedThemes = themes.map((theme: PublicTheme, index: number) => ({
           ...theme,
-          emoji: ["🎮", "🎯", "🎲", "🎪", "🎨", "🎭", "🎬", "🎤", "🎸", "⚽"][index % 10],
+          emoji: ["🎮", "🎯", "🎲", "🎪", "🎨", "🎭", "🎬", "🎤", "🎸", "🌟"][index % 10],
           plays: Math.floor(Math.random() * 1000) + 50,
           likes: Math.floor(Math.random() * 200) + 10,
-          isHot: index < 2,
+          isHot: false,
         }));
-        setPublicThemes(enrichedThemes);
+        // Combine featured themes with API themes
+        setPublicThemes([...featuredThemes, ...enrichedThemes]);
+      } else {
+        // If API fails, show at least the featured themes
+        setPublicThemes(featuredThemes);
       }
     } catch (err) {
       console.error("Failed to load themes:", err);
-      toast({ title: "Erro", description: "Falha ao carregar temas", variant: "destructive" });
+      // Show featured themes even if API fails
+      const featuredThemes: PublicTheme[] = [
+        {
+          id: 'futebol-maylon',
+          titulo: 'Futebol',
+          autor: 'Maylon',
+          palavrasCount: 20,
+          accessCode: 'FUTEBOL',
+          createdAt: new Date().toISOString(),
+          emoji: '⚽',
+          plays: 1250,
+          likes: 340,
+          isHot: true,
+        },
+        {
+          id: 'disney-luciana',
+          titulo: 'Disney',
+          autor: '@Luciana',
+          palavrasCount: 30,
+          accessCode: 'DISNEY',
+          createdAt: new Date().toISOString(),
+          emoji: '🏰',
+          plays: 980,
+          likes: 285,
+          isHot: true,
+        }
+      ];
+      setPublicThemes(featuredThemes);
+      toast({ title: "Aviso", description: "Mostrando temas em destaque", variant: "default" });
     } finally {
       setIsLoadingThemes(false);
     }
@@ -62,10 +122,23 @@ export default function CommunityThemes() {
 
   const handlePlayTheme = async (theme: PublicTheme) => {
     try {
-      // Store theme data for immediate game start
-      sessionStorage.setItem("selectedThemeId", theme.id);
-      sessionStorage.setItem("selectedThemeCode", theme.accessCode);
-      sessionStorage.setItem("autoStartGame", "true");
+      // Check if it's a featured theme (Futebol or Disney)
+      if (theme.id === 'futebol-maylon') {
+        // Use Futebol submode
+        sessionStorage.setItem("selectedGameMode", "palavraSecreta");
+        sessionStorage.setItem("selectedSubmode", "futebol");
+        sessionStorage.setItem("autoStartGame", "true");
+      } else if (theme.id === 'disney-luciana') {
+        // Use Disney submode
+        sessionStorage.setItem("selectedGameMode", "palavraSecreta");
+        sessionStorage.setItem("selectedSubmode", "disney");
+        sessionStorage.setItem("autoStartGame", "true");
+      } else {
+        // Regular community theme
+        sessionStorage.setItem("selectedThemeId", theme.id);
+        sessionStorage.setItem("selectedThemeCode", theme.accessCode);
+        sessionStorage.setItem("autoStartGame", "true");
+      }
       
       // Redirect to game
       setLocation("/");
